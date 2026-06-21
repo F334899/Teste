@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meu Escritório — Flaviane Bilhar Caler</title>
 <meta name="description" content="Sistema de gestão jurídica — Direito da Saúde & Previdenciário">
-<meta name="theme-color" content="#312e81">
+<meta name="theme-color" content="#96655F">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -34,10 +34,10 @@
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   input, select, textarea { border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; width: 100%; font-size: 14px; outline: none; }
-  input:focus, select:focus, textarea:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+  input:focus, select:focus, textarea:focus { border-color: #96655F; box-shadow: 0 0 0 3px rgba(150,101,95,0.15); }
   .btn { padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
-  .btn-primary { background: #4f46e5; color: white; }
-  .btn-primary:hover { background: #4338ca; }
+  .btn-primary { background: #96655F; color: white; }
+  .btn-primary:hover { background: #7a504b; }
   .btn-danger { background: #ef4444; color: white; }
   .btn-danger:hover { background: #dc2626; }
   .btn-secondary { background: #f3f4f6; color: #374151; }
@@ -74,21 +74,21 @@
 <body class="bg-gray-50">
 
 <!-- SIDEBAR -->
-<aside class="sidebar fixed top-0 left-0 bg-gradient-to-b from-indigo-900 to-indigo-800 text-white flex flex-col z-50">
-  <div class="p-5 border-b border-indigo-700">
+<aside class="sidebar fixed top-0 left-0 bg-gradient-to-b from-[#5c3d39] to-[#7a504b] text-white flex flex-col z-50">
+  <div class="p-5 border-b border-[#5c3d39]">
     <div class="flex items-center gap-3 mb-1">
       <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
         <i class="fas fa-balance-scale text-white"></i>
       </div>
       <div>
         <h1 class="font-bold text-sm leading-tight">Seu Escritório</h1>
-        <p class="text-indigo-300 text-xs">Direito da Saúde & Prev.</p>
+        <p class="text-rose-200 text-xs">Direito da Saúde & Prev.</p>
       </div>
     </div>
   </div>
 
   <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
-    <p class="text-indigo-400 text-xs font-semibold uppercase px-3 pt-2 pb-1">Principal</p>
+    <p class="text-rose-300 text-xs font-semibold uppercase px-3 pt-2 pb-1">Principal</p>
     <a onclick="showSection('djen')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-djen">
       <i class="fas fa-satellite-dish w-4"></i> Monitor DJEN
       <span class="ml-auto bg-yellow-400 text-yellow-900 text-xs rounded-full px-1.5 py-0.5 hidden" id="badge-djen">0</span>
@@ -103,7 +103,7 @@
       <i class="fas fa-folder-open w-4"></i> Processos
     </a>
 
-    <p class="text-indigo-400 text-xs font-semibold uppercase px-3 pt-3 pb-1">Controle</p>
+    <p class="text-rose-300 text-xs font-semibold uppercase px-3 pt-3 pb-1">Controle</p>
     <a onclick="showSection('prazos')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-prazos">
       <i class="fas fa-clock w-4"></i> Prazos
       <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5" id="badge-prazos">0</span>
@@ -115,7 +115,7 @@
       <i class="fas fa-dollar-sign w-4"></i> Financeiro
     </a>
 
-    <p class="text-indigo-400 text-xs font-semibold uppercase px-3 pt-3 pb-1">Ferramentas</p>
+    <p class="text-rose-300 text-xs font-semibold uppercase px-3 pt-3 pb-1">Ferramentas</p>
     <a onclick="showSection('documentos')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-documentos">
       <i class="fas fa-file-alt w-4"></i> Documentos & IA
     </a>
@@ -127,8 +127,8 @@
     </a>
   </nav>
 
-  <div class="p-4 border-t border-indigo-700">
-    <div class="flex items-center gap-2 text-xs text-indigo-300">
+  <div class="p-4 border-t border-[#5c3d39]">
+    <div class="flex items-center gap-2 text-xs text-rose-200">
       <span class="integr-dot bg-green-400"></span> Google Drive
       <span class="integr-dot bg-green-400 ml-1"></span> Notion
       <span class="integr-dot bg-green-400 ml-1"></span> GCal
@@ -147,7 +147,7 @@
     </div>
     <div class="flex items-center gap-3">
       <span class="text-gray-400 text-sm" id="current-date"></span>
-      <button id="btn-instalar" onclick="instalarApp()" class="btn text-sm hidden" style="background:#312e81;color:white;">
+      <button id="btn-instalar" onclick="instalarApp()" class="btn text-sm hidden" style="background:#6b3f3a;color:white;">
         <i class="fas fa-download mr-1"></i> Instalar como App
       </button>
       <button onclick="openModal('modal-config')" class="btn btn-secondary text-sm">
@@ -159,7 +159,7 @@
   <!-- ===== DASHBOARD ===== -->
   <div id="section-dashboard" class="section active">
     <div class="grid grid-cols-4 gap-4 mb-6">
-      <div class="stat-card border-l-4 border-indigo-500">
+      <div class="stat-card border-l-4 border-rose-400">
         <p class="text-gray-500 text-xs font-medium uppercase mb-1">Clientes Ativos</p>
         <p class="text-3xl font-bold text-gray-800" id="stat-clientes">0</p>
         <p class="text-xs text-green-600 mt-1"><i class="fas fa-arrow-up"></i> Ativos</p>
@@ -217,9 +217,14 @@
         <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
         <input type="text" placeholder="Buscar cliente..." class="pl-9 pr-4 py-2 text-sm w-64" oninput="filtrarClientes(this.value)" id="busca-cliente">
       </div>
-      <button onclick="openModal('modal-cliente')" class="btn btn-primary">
-        <i class="fas fa-plus mr-2"></i>Novo Cliente
-      </button>
+      <div class="flex gap-2">
+        <button onclick="openModal('modal-importar-doc')" class="btn btn-secondary">
+          <i class="fas fa-file-import mr-2"></i>Importar da Procuração
+        </button>
+        <button onclick="openModal('modal-cliente')" class="btn btn-primary">
+          <i class="fas fa-plus mr-2"></i>Novo Cliente
+        </button>
+      </div>
     </div>
 
     <div class="card overflow-hidden">
@@ -386,13 +391,18 @@
   <div id="section-documentos" class="section">
     <div class="mb-5">
       <p class="text-gray-500 text-sm mb-4">Selecione um modelo de documento para gerar com assistência de IA:</p>
-      <div class="flex gap-2 mb-4 flex-wrap">
+      <div class="flex gap-2 mb-4 flex-wrap items-center">
         <button onclick="filtrarAgentes('todos')" class="btn btn-primary text-xs">Todos</button>
         <button onclick="filtrarAgentes('previdenciario')" class="btn btn-secondary text-xs">⚖️ Previdenciário</button>
         <button onclick="filtrarAgentes('saude')" class="btn btn-secondary text-xs">🏥 Saúde</button>
         <button onclick="filtrarAgentes('peticao')" class="btn btn-secondary text-xs">📄 Petições</button>
         <button onclick="filtrarAgentes('contratos')" class="btn btn-secondary text-xs">📋 Contratos</button>
         <button onclick="filtrarAgentes('recurso')" class="btn btn-secondary text-xs">📨 Recursos</button>
+        <div class="ml-auto">
+          <button onclick="abrirModalContrato()" class="btn btn-primary text-xs">
+            <i class="fas fa-file-contract mr-1"></i>Proposta → Contrato
+          </button>
+        </div>
       </div>
       <div id="grid-agentes" class="grid grid-cols-3 gap-3"></div>
     </div>
@@ -404,8 +414,8 @@
     <!-- Status bar -->
     <div class="card p-4 mb-5 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-          <i class="fas fa-satellite-dish text-indigo-600"></i>
+        <div class="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center">
+          <i class="fas fa-satellite-dish text-rose-700"></i>
         </div>
         <div>
           <p class="font-semibold text-gray-800">Monitor DJEN — OAB SC054395</p>
@@ -430,7 +440,7 @@
 
     <!-- Stats -->
     <div class="grid grid-cols-4 gap-4 mb-5">
-      <div class="stat-card border-l-4 border-indigo-500">
+      <div class="stat-card border-l-4 border-rose-400">
         <p class="text-xs text-gray-500 uppercase font-medium mb-1">Publicações Hoje</p>
         <p class="text-3xl font-bold text-gray-800" id="djen-cnt-hoje">—</p>
       </div>
@@ -452,7 +462,7 @@
     <div class="card p-5">
       <div class="flex items-center justify-between mb-4">
         <h3 class="font-semibold text-gray-700 flex items-center gap-2">
-          <i class="fas fa-list text-indigo-400"></i> Publicações Encontradas
+          <i class="fas fa-list text-rose-300"></i> Publicações Encontradas
         </h3>
         <div class="flex gap-2">
           <button onclick="importarTodosDJEN()" class="btn btn-green text-sm hidden" id="btn-importar-todos">
@@ -487,7 +497,7 @@
       <!-- Formulário -->
       <div class="col-span-2 space-y-4">
         <div class="card p-5">
-          <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2"><i class="fas fa-edit text-indigo-500"></i> Dados do Relatório</h3>
+          <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2"><i class="fas fa-edit text-rose-600"></i> Dados do Relatório</h3>
           <div class="space-y-3 text-sm">
 
             <div><label class="text-xs text-gray-500 mb-1 block font-medium">Cliente *</label>
@@ -588,7 +598,7 @@
       <div class="col-span-3">
         <div class="card p-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-eye text-indigo-500"></i> Pré-visualização</h3>
+            <h3 class="font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-eye text-rose-600"></i> Pré-visualização</h3>
             <div class="flex gap-2">
               <button onclick="copiarRelatorio()" class="btn btn-secondary text-xs"><i class="fas fa-copy mr-1"></i>Copiar</button>
               <button onclick="salvarRelatorioHistorico()" class="btn btn-secondary text-xs"><i class="fas fa-save mr-1"></i>Salvar Histórico</button>
@@ -668,7 +678,7 @@
       <div class="grid grid-cols-2 gap-4">
         <!-- Exportar -->
         <div class="bg-gray-50 rounded-xl p-4">
-          <p class="font-medium text-gray-700 text-sm mb-1"><i class="fas fa-download text-indigo-500 mr-1"></i>Exportar</p>
+          <p class="font-medium text-gray-700 text-sm mb-1"><i class="fas fa-download text-rose-600 mr-1"></i>Exportar</p>
           <p class="text-xs text-gray-400 mb-3">Salva todos os dados do escritório em um arquivo seguro.</p>
           <div class="flex flex-col gap-2">
             <button onclick="exportarJSON()" class="btn btn-primary text-sm w-full">
@@ -716,7 +726,7 @@
 <!-- Modal Cliente -->
 <div class="modal-overlay" id="modal-cliente">
   <div class="bg-white rounded-2xl p-6 w-[520px] max-h-[90vh] overflow-y-auto">
-    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-user-plus mr-2 text-indigo-600"></i>Novo Cliente</h3>
+    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-user-plus mr-2 text-rose-700"></i>Novo Cliente</h3>
     <div class="space-y-3">
       <div class="grid grid-cols-2 gap-3">
         <div><label class="text-xs text-gray-500 mb-1 block">Nome Completo *</label><input id="cli-nome" placeholder="Nome completo"></div>
@@ -750,7 +760,7 @@
 <!-- Modal Processo -->
 <div class="modal-overlay" id="modal-processo">
   <div class="bg-white rounded-2xl p-6 w-[580px] max-h-[90vh] overflow-y-auto">
-    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-folder-plus mr-2 text-indigo-600"></i>Novo Processo</h3>
+    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-folder-plus mr-2 text-rose-700"></i>Novo Processo</h3>
     <div class="space-y-3">
       <div class="grid grid-cols-2 gap-3">
         <div><label class="text-xs text-gray-500 mb-1 block">Nº do Processo *</label><input id="proc-num" placeholder="0000000-00.0000.0.00.0000"></div>
@@ -814,6 +824,57 @@
     <div class="flex justify-end gap-3 mt-5">
       <button onclick="closeModal('modal-processo')" class="btn btn-secondary">Cancelar</button>
       <button onclick="salvarProcesso()" class="btn btn-primary">Salvar Processo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Importar de Documento -->
+<div class="modal-overlay" id="modal-importar-doc">
+  <div class="bg-white rounded-2xl p-6 w-[600px] max-h-[85vh] flex flex-col">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-file-import mr-2 text-[#96655F]"></i>Importar Cliente de Documento</h3>
+      <button onclick="closeModal('modal-importar-doc')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+    </div>
+    <p class="text-xs text-gray-500 mb-3">Cole aqui o texto de uma <strong>procuração</strong> ou <strong>proposta de honorários</strong> gerada no Claude. O sistema vai extrair automaticamente os dados do cliente.</p>
+    <textarea id="imp-doc-texto" rows="10" placeholder="Cole aqui o texto completo da procuração ou proposta de honorários..." class="text-sm flex-1 mb-3"></textarea>
+    <button onclick="extrairDadosDocumento()" class="btn btn-primary w-full mb-3">
+      <i class="fas fa-magic mr-2"></i>Extrair Dados Automaticamente
+    </button>
+    <div id="imp-doc-resultado" class="mb-3"></div>
+    <button onclick="confirmarImportacaoCliente()" class="btn btn-green w-full">
+      <i class="fas fa-user-plus mr-2"></i>Confirmar e Cadastrar Cliente
+    </button>
+  </div>
+</div>
+
+<!-- Modal Contrato de Honorários -->
+<div class="modal-overlay" id="modal-contrato">
+  <div class="bg-white rounded-2xl p-6 w-[700px] max-h-[90vh] flex flex-col">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-file-contract mr-2 text-[#96655F]"></i>Gerar Contrato de Honorários</h3>
+      <button onclick="closeModal('modal-contrato')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div><label class="text-xs text-gray-500 mb-1 block">Cliente *</label><select id="contrato-cliente" class="text-sm"><option value="">Selecione...</option></select></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Valor Fixo (R$)</label><input id="contrato-valor" placeholder="Ex: 2.000,00" class="text-sm"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">% de Êxito</label><input id="contrato-percentual" placeholder="Ex: 20%" class="text-sm"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Forma de Pagamento</label>
+        <select id="contrato-forma" class="text-sm">
+          <option>À vista na assinatura</option>
+          <option>2x — entrada + final</option>
+          <option>3x mensais</option>
+          <option>Parcelado conforme acordo</option>
+        </select>
+      </div>
+    </div>
+    <button onclick="abrirGerarContrato()" class="btn btn-primary mb-4">
+      <i class="fas fa-file-alt mr-2"></i>Gerar Contrato e Lançar nos Honorários
+    </button>
+    <div id="contrato-output" class="border border-gray-200 rounded-xl p-6 overflow-y-auto flex-1 text-sm leading-relaxed bg-white min-h-[200px]">
+      <p class="text-gray-400 text-center py-8">Preencha os dados acima e clique em "Gerar Contrato"</p>
+    </div>
+    <div class="flex gap-2 mt-3">
+      <button onclick="imprimirContrato()" class="btn btn-secondary flex-1"><i class="fas fa-print mr-2"></i>Imprimir / PDF</button>
     </div>
   </div>
 </div>
@@ -947,7 +1008,7 @@
   <div class="bg-white rounded-2xl p-6 w-[600px] max-h-[90vh] overflow-y-auto">
     <h3 class="text-lg font-bold text-gray-800 mb-2" id="doc-modal-titulo">Gerar Documento</h3>
     <p class="text-sm text-gray-500 mb-4" id="doc-modal-desc"></p>
-    <div class="bg-indigo-50 rounded-xl p-4 mb-4 space-y-3">
+    <div class="bg-rose-50 rounded-xl p-4 mb-4 space-y-3">
       <div><label class="text-xs text-gray-500 mb-1 block">Cliente</label><select id="doc-cliente"><option value="">Selecione...</option></select></div>
       <div><label class="text-xs text-gray-500 mb-1 block">Processo (opcional)</label><input id="doc-processo" placeholder="Nº do processo"></div>
       <div><label class="text-xs text-gray-500 mb-1 block">Informações adicionais</label><textarea id="doc-info" rows="4" placeholder="Descreva os fatos relevantes para o documento..."></textarea></div>
@@ -1141,7 +1202,7 @@ function renderProcessos() {
   const areas = ['Previdenciário','BPC/LOAS','Auxílio-Doença','Aposentadoria','Direito da Saúde','Plano de Saúde','Erro Médico'];
   tbody.innerHTML = lista.map(p => `
     <tr class="table-row border-b">
-      <td class="px-4 py-3 font-mono text-xs text-indigo-700 font-semibold">${p.numero}</td>
+      <td class="px-4 py-3 font-mono text-xs text-rose-800 font-semibold">${p.numero}</td>
       <td class="px-4 py-3 font-medium text-gray-800">${p.clienteNome}</td>
       <td class="px-4 py-3">
         <select onchange="alterarAreaProcesso(${p.id}, this.value)" class="text-xs border border-purple-200 rounded-full px-2 py-1 bg-purple-50 text-purple-700 font-semibold focus:outline-none cursor-pointer">
@@ -1398,7 +1459,7 @@ function renderCalendario() {
     const dataStr = `${calAno}-${String(calMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const temEvento = db.compromissos.some(c => c.data === dataStr);
     const isHoje = d === hoje.getDate() && calMes === hoje.getMonth() && calAno === hoje.getFullYear();
-    cal.innerHTML += `<div onclick="mostrarDia('${dataStr}')" class="min-h-[50px] rounded-lg p-1.5 cursor-pointer hover:bg-indigo-50 border ${isHoje ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-100 bg-white'}">
+    cal.innerHTML += `<div onclick="mostrarDia('${dataStr}')" class="min-h-[50px] rounded-lg p-1.5 cursor-pointer hover:bg-rose-50 border ${isHoje ? 'bg-rose-600 text-white border-rose-600' : 'border-gray-100 bg-white'}">
       <span class="text-xs font-semibold">${d}</span>
       ${temEvento ? `<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1"></div>` : ''}
     </div>`;
@@ -1502,6 +1563,7 @@ const agentes = [
   { id: 22, nome: 'Resumo de Processo', cat: 'previdenciario', icon: '📑', desc: 'Resumo executivo do processo para relatório ao cliente' },
   { id: 23, nome: 'Parecer Jurídico', cat: 'peticao', icon: '🎓', desc: 'Elaboração de parecer jurídico fundamentado' },
   { id: 24, nome: 'Due Diligence Jurídica', cat: 'contratos', icon: '🔎', desc: 'Análise e due diligence de contratos e operações' },
+  { id: 25, nome: 'Proposta de Honorários', cat: 'contratos', icon: '💰', desc: 'Proposta formal de honorários advocatícios personalizada por cliente' },
 ];
 
 let filtroAgenteAtual = 'todos';
@@ -1521,10 +1583,26 @@ function renderAgentes() {
 
 let agenteAtual = null;
 function abrirAgente(id) {
+  // Contrato de honorários → modal dedicado
+  if (id === 18) { abrirModalContrato(); return; }
   agenteAtual = agentes.find(a => a.id === id);
   document.getElementById('doc-modal-titulo').textContent = agenteAtual.icon + ' ' + agenteAtual.nome;
   document.getElementById('doc-modal-desc').textContent = agenteAtual.desc;
-  document.getElementById('doc-output').innerHTML = '<p class="text-gray-400 text-center py-4">Preencha os dados e clique em "Gerar com IA"</p>';
+  // Popular select de cliente no modal de documento
+  const sel = document.getElementById('doc-cliente');
+  sel.innerHTML = '<option value="">Selecione...</option>' + db.clientes.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+  // Procuração e Proposta de Honorários → gera preview imediato ao selecionar cliente
+  if (id === 19 || id === 25) {
+    document.getElementById('doc-output').innerHTML = '<p class="text-gray-400 text-center py-4">Selecione o cliente para gerar o documento</p>';
+    sel.onchange = () => {
+      const cId = sel.value;
+      if (!cId) return;
+      document.getElementById('doc-output').innerHTML = id === 19 ? gerarProcuracao(cId) : gerarPropostaHonorarios(cId);
+    };
+  } else {
+    sel.onchange = null;
+    document.getElementById('doc-output').innerHTML = '<p class="text-gray-400 text-center py-4">Preencha os dados e clique em "Gerar com IA"</p>';
+  }
   openModal('modal-documento');
 }
 
@@ -1556,13 +1634,229 @@ function gerarDocumento() {
           [Cidade], ${hoje}<br><br>
           <em>[Advogado(a) — OAB]</em>
         </p>
-        <p class="text-xs text-indigo-600 bg-indigo-50 rounded p-2">💡 Este é um modelo base. Personalize com os dados completos do cliente e fundamentos específicos do caso.</p>
+        <p class="text-xs text-rose-700 bg-rose-50 rounded p-2">💡 Este é um modelo base. Personalize com os dados completos do cliente e fundamentos específicos do caso.</p>
       </div>`;
     btn.textContent = 'Gerar com IA'; btn.disabled = false;
   }, 1200);
 }
 
 function salvarDocDrive() { toast('Documento salvo no Google Drive! (integração ativa)'); }
+
+// ==================== IMPORTAR CLIENTE DE DOCUMENTO ====================
+function extrairDadosDocumento() {
+  const texto = document.getElementById('imp-doc-texto').value;
+  if (!texto.trim()) { toast('Cole o texto do documento primeiro', 'err'); return; }
+
+  // Extrai campos por padrões comuns de procuração e proposta de honorários
+  const extrair = (patterns, txt) => {
+    for (const p of patterns) {
+      const m = txt.match(p);
+      if (m && m[1]) return m[1].trim();
+    }
+    return '';
+  };
+
+  const nome = extrair([
+    /outorgante[:\s]+([A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-ZÀ-Úa-zà-ú]+){1,5})/i,
+    /cliente[:\s]+([A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-ZÀ-Úa-zà-ú]+){1,5})/i,
+    /contratante[:\s]+([A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-ZÀ-Úa-zà-ú]+){1,5})/i,
+    /nome[:\s]+([A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-ZÀ-Úa-zà-ú]+){1,5})/i,
+    /^([A-ZÀ-Ú][A-ZÀ-Ú\s]{5,40}),\s*(?:brasileiro|brasileira)/m,
+  ], texto);
+
+  const cpf = extrair([
+    /CPF[:\s.]*n?[oº]?[:\s]*([\d]{3}[\.\s]?[\d]{3}[\.\s]?[\d]{3}[-\s]?[\d]{2})/i,
+    /inscrit[oa]\s+no\s+CPF[^\d]*([\d.\-]+)/i,
+  ], texto);
+
+  const rg = extrair([
+    /RG[:\s.]*n?[oº]?[:\s]*([\d.\-\/]+)/i,
+    /identidade[^\d]*([\d.\-\/]+)/i,
+  ], texto);
+
+  const email = extrair([
+    /e[-\s]?mail[:\s]+([\w.+\-]+@[\w.\-]+\.[a-z]{2,})/i,
+    /([\w.+\-]+@[\w.\-]+\.[a-z]{2,})/,
+  ], texto);
+
+  const tel = extrair([
+    /tel[ée]fone[:\s]*\(?([\d\s()\-+]{8,16})/i,
+    /whatsapp[:\s]*\(?([\d\s()\-+]{8,16})/i,
+    /celular[:\s]*\(?([\d\s()\-+]{8,16})/i,
+    /\((\d{2})\)\s*9?\d{4}[-\s]?\d{4}/,
+  ], texto);
+
+  const end = extrair([
+    /residente[^,\n]*(?:em|à|na|no)[,\s]+([^,\n]{10,80})/i,
+    /endere[çc]o[:\s]+([^\n]{10,80})/i,
+  ], texto);
+
+  const area = /previdenci/i.test(texto) ? 'Previdenciário'
+             : /sa[úu]de|plano|m[ée]dic/i.test(texto) ? 'Direito da Saúde'
+             : '';
+
+  // Preenche os campos do modal de cliente
+  document.getElementById('cli-nome').value  = nome;
+  document.getElementById('cli-cpf').value   = cpf;
+  document.getElementById('cli-rg').value    = rg;
+  document.getElementById('cli-email').value = email;
+  document.getElementById('cli-tel').value   = tel.replace(/[^\d()\s\-+]/g,'').trim();
+  if (end) document.getElementById('cli-end') && (document.getElementById('cli-end').value = end);
+  if (area) document.getElementById('cli-area').value = area;
+
+  const encontrados = [nome,cpf,email,tel].filter(Boolean).length;
+  document.getElementById('imp-doc-resultado').innerHTML =
+    `<div class="bg-green-50 border border-green-200 rounded-lg p-3 text-xs text-green-700">
+      ✅ <strong>${encontrados} campo(s) identificado(s):</strong>
+      ${nome ? `<br>• Nome: <strong>${nome}</strong>` : ''}
+      ${cpf  ? `<br>• CPF: <strong>${cpf}</strong>` : ''}
+      ${rg   ? `<br>• RG: <strong>${rg}</strong>` : ''}
+      ${email? `<br>• E-mail: <strong>${email}</strong>` : ''}
+      ${tel  ? `<br>• Telefone: <strong>${tel}</strong>` : ''}
+      ${area ? `<br>• Área: <strong>${area}</strong>` : ''}
+      <br><br>Clique em <strong>Confirmar e Cadastrar</strong> para salvar o cliente.
+    </div>`;
+}
+
+function abrirModalContrato() {
+  const sel = document.getElementById('contrato-cliente');
+  sel.innerHTML = '<option value="">Selecione...</option>' +
+    db.clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+  document.getElementById('contrato-output').innerHTML = '<p class="text-gray-400 text-center py-8">Preencha os dados acima e clique em "Gerar Contrato"</p>';
+  openModal('modal-contrato');
+}
+
+function confirmarImportacaoCliente() {
+  const nome = document.getElementById('cli-nome').value;
+  if (!nome) { toast('Não foi possível identificar o nome. Verifique o documento.', 'err'); return; }
+  closeModal('modal-importar-doc');
+  openModal('modal-cliente');
+  toast('Dados importados! Revise e salve o cliente.');
+}
+
+// ==================== TEMPLATES DE DOCUMENTOS DO ESCRITÓRIO ====================
+function gerarProcuracao(clienteId) {
+  const c = db.clientes.find(cl => cl.id == clienteId) || {};
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
+  return `
+<div class="space-y-4 font-serif text-sm leading-relaxed">
+  <h2 class="text-center font-bold text-base">PROCURAÇÃO AD JUDICIA ET EXTRA</h2>
+  <p><strong>OUTORGANTE:</strong> ${c.nome||'[NOME]'}, ${c.nacionalidade||'brasileiro(a)'}, ${c.estadoCivil||'[estado civil]'}, ${c.profissao||'[profissão]'}, portador(a) do CPF nº ${c.cpf||'[CPF]'} e RG nº ${c.rg||'[RG]'}, residente e domiciliado(a) em ${c.endereco||'[ENDEREÇO]'}.</p>
+  <p><strong>OUTORGADA:</strong> Dra. <strong>FLAVIANE BILHAR CALER</strong>, Advogada, inscrita na OAB/SC sob o nº 54.395, com escritório profissional na Av. Fernando Machado, 141-E, sala 1001, Edifício IL Centenário, Chapecó/SC.</p>
+  <p><strong>PODERES:</strong> Para o foro em geral, com poderes para propor, contestar e defender em quaisquer ações e recursos, praticar todos os atos necessários ao fiel desempenho do mandato, inclusive para desistir, transigir, firmar compromissos, receber e dar quitação, com a cláusula <em>ad judicia et extra</em>, podendo ainda substabelecer a terceiros, com ou sem reserva de iguais poderes.</p>
+  <p><strong>OBJETO:</strong> ${c.processoDescricao||'[Descreva o objeto da procuração]'}</p>
+  <p>Chapecó/SC, ${hoje}.</p>
+  <br>
+  <p class="text-center">_______________________________________</p>
+  <p class="text-center">${c.nome||'[NOME DO OUTORGANTE]'}</p>
+  <p class="text-center text-xs">CPF: ${c.cpf||'[CPF]'}</p>
+</div>`;
+}
+
+function gerarPropostaHonorarios(clienteId) {
+  const c = db.clientes.find(cl => cl.id == clienteId) || {};
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
+  return `
+<div class="space-y-4 text-sm leading-relaxed">
+  <div class="text-center border-b pb-4 mb-4">
+    <p class="font-bold text-base">FLAVIANE BILHAR CALER — ADVOCACIA</p>
+    <p class="text-xs text-gray-500">OAB/SC 54.395 | (49) 98806-1881 | admflavianecaler@gmail.com</p>
+    <p class="text-xs text-gray-500">Av. Fernando Machado, 141-E, Sala 1001 — Edifício IL Centenário, Chapecó/SC</p>
+  </div>
+  <h3 class="font-bold text-center">PROPOSTA DE HONORÁRIOS ADVOCATÍCIOS</h3>
+  <p><strong>Cliente:</strong> ${c.nome||'[NOME]'} | <strong>CPF:</strong> ${c.cpf||'[CPF]'}</p>
+  <p><strong>Serviço:</strong> ${c.area||'[ÁREA]'} — ${c.processoDescricao||'[descreva o serviço]'}</p>
+  <hr>
+  <p><strong>HONORÁRIOS:</strong></p>
+  <p>• Valor fixo inicial: R$ [VALOR]</p>
+  <p>• Êxito: [X]% sobre o valor obtido</p>
+  <p>• Forma de pagamento: [À VISTA / PARCELADO]</p>
+  <hr>
+  <p class="text-xs text-gray-500">Esta proposta tem validade de 15 dias. Os valores acima não incluem custas judiciais, despesas processuais e diligências.</p>
+  <p>Chapecó/SC, ${hoje}.</p>
+  <br>
+  <p class="text-center">_______________________________________</p>
+  <p class="text-center text-xs">Dra. Flaviane Bilhar Caler — OAB/SC 54.395</p>
+</div>`;
+}
+
+function gerarContrato(clienteId, valorFixo, percentualExito, formaPag) {
+  const c = db.clientes.find(cl => cl.id == clienteId) || {};
+  const hoje = new Date().toLocaleDateString('pt-BR',{day:'numeric',month:'long',year:'numeric'});
+  return `
+<div class="space-y-4 font-serif text-sm leading-relaxed">
+  <h2 class="text-center font-bold text-base">CONTRATO DE PRESTAÇÃO DE SERVIÇOS ADVOCATÍCIOS</h2>
+  <p><strong>CONTRATANTE:</strong> ${c.nome||'[NOME]'}, ${c.nacionalidade||'brasileiro(a)'}, portador(a) do CPF nº ${c.cpf||'[CPF]'} e RG nº ${c.rg||'[RG]'}, residente em ${c.endereco||'[ENDEREÇO]'}, doravante denominado(a) simplesmente <strong>CONTRATANTE</strong>.</p>
+  <p><strong>CONTRATADA:</strong> Dra. <strong>FLAVIANE BILHAR CALER</strong>, Advogada, inscrita na OAB/SC sob o nº 54.395, CPF nº 038.971.979-07, com escritório na Av. Fernando Machado, 141-E, sala 1001, Edifício IL Centenário, Chapecó/SC, doravante denominada <strong>CONTRATADA</strong>.</p>
+  <p><strong>CLÁUSULA 1ª — DO OBJETO</strong><br>
+  A CONTRATADA prestará serviços advocatícios ao CONTRATANTE na área de ${c.area||'[ÁREA]'}, compreendendo: ${c.processoDescricao||'[descrição dos serviços]'}, incluindo todos os atos necessários à defesa dos interesses do CONTRATANTE, desde a elaboração de documentos até o trânsito em julgado.</p>
+  <p><strong>CLÁUSULA 2ª — DOS HONORÁRIOS</strong><br>
+  Pelos serviços prestados, o CONTRATANTE pagará à CONTRATADA:<br>
+  a) Honorários fixos: R$ ${valorFixo||'[VALOR]'}, pagos da seguinte forma: ${formaPag||'[forma de pagamento]'};<br>
+  b) Honorários de êxito: ${percentualExito||'[X]'}% (por cento) sobre o valor efetivamente obtido em caso de resultado favorável.</p>
+  <p><strong>CLÁUSULA 3ª — DAS CUSTAS E DESPESAS</strong><br>
+  As custas judiciais, emolumentos, despesas com diligências e demais encargos processuais serão de responsabilidade do CONTRATANTE, e deverão ser reembolsadas à CONTRATADA quando por esta adiantadas.</p>
+  <p><strong>CLÁUSULA 4ª — DA RESCISÃO</strong><br>
+  O presente contrato poderá ser rescindido por qualquer das partes, mediante notificação prévia de 15 (quinze) dias, sem prejuízo do pagamento proporcional pelos serviços já prestados.</p>
+  <p><strong>CLÁUSULA 5ª — DO FORO</strong><br>
+  As partes elegem o foro da Comarca de Chapecó/SC para dirimir quaisquer dúvidas ou litígios decorrentes do presente instrumento.</p>
+  <p>Chapecó/SC, ${hoje}.</p>
+  <br>
+  <div class="grid grid-cols-2 gap-8 mt-6">
+    <div class="text-center">
+      <p>_______________________________________</p>
+      <p>${c.nome||'[NOME DO CONTRATANTE]'}</p>
+      <p class="text-xs">CPF: ${c.cpf||'[CPF]'}</p>
+    </div>
+    <div class="text-center">
+      <p>_______________________________________</p>
+      <p>Dra. Flaviane Bilhar Caler</p>
+      <p class="text-xs">OAB/SC 54.395</p>
+    </div>
+  </div>
+  <div class="mt-4">
+    <p><strong>TESTEMUNHAS:</strong></p>
+    <div class="grid grid-cols-2 gap-8 mt-3">
+      <div class="text-center"><p>_______________________</p><p class="text-xs">Nome / CPF</p></div>
+      <div class="text-center"><p>_______________________</p><p class="text-xs">Nome / CPF</p></div>
+    </div>
+  </div>
+</div>`;
+}
+
+function abrirGerarContrato() {
+  const clienteId = document.getElementById('contrato-cliente').value;
+  const valorFixo   = document.getElementById('contrato-valor').value;
+  const percentual  = document.getElementById('contrato-percentual').value;
+  const formaPag    = document.getElementById('contrato-forma').value;
+  if (!clienteId) { toast('Selecione o cliente', 'err'); return; }
+  document.getElementById('contrato-output').innerHTML = gerarContrato(clienteId, valorFixo, percentual, formaPag);
+  // Lança nos honorários
+  const c = db.clientes.find(cl => cl.id == clienteId);
+  if (valorFixo && c) {
+    db.honorarios.push({
+      id: Date.now(),
+      clienteNome: c.nome,
+      servico: c.area || 'Advocatício',
+      valor: parseFloat(valorFixo.replace(',','.')),
+      status: 'Pendente',
+      data: new Date().toISOString().split('T')[0]
+    });
+    saveDB(); updateBadges();
+    toast('Contrato gerado e lançado nos honorários!');
+  }
+}
+
+function imprimirContrato() {
+  const conteudo = document.getElementById('contrato-output').innerHTML;
+  const janela = window.open('','_blank');
+  janela.document.write(`<html><head><title>Contrato</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quattrocento+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Quattrocento Sans',serif;padding:40px;max-width:760px;margin:auto;font-size:12pt;line-height:1.8}h2{text-align:center}@media print{body{padding:20px}}</style>
+    </head><body>${conteudo}</body></html>`);
+  janela.document.close();
+  janela.print();
+}
 
 // ==================== DASHBOARD ====================
 let charts = {};
@@ -1576,13 +1870,13 @@ function renderDashboard() {
   const areas = {}; db.processos.forEach(p => areas[p.area] = (areas[p.area]||0)+1);
   const ctx1 = document.getElementById('chart-areas').getContext('2d');
   if (charts.areas) charts.areas.destroy();
-  charts.areas = new Chart(ctx1, { type:'bar', data: { labels: Object.keys(areas), datasets: [{ label:'Processos', data: Object.values(areas), backgroundColor: '#6366f1', borderRadius: 6 }]}, options: { plugins: {legend:{display:false}}, scales: {y:{beginAtZero:true}} }});
+  charts.areas = new Chart(ctx1, { type:'bar', data: { labels: Object.keys(areas), datasets: [{ label:'Processos', data: Object.values(areas), backgroundColor: '#96655F', borderRadius: 6 }]}, options: { plugins: {legend:{display:false}}, scales: {y:{beginAtZero:true}} }});
 
   // Chart status
   const status = {}; db.processos.forEach(p => status[p.status] = (status[p.status]||0)+1);
   const ctx2 = document.getElementById('chart-status').getContext('2d');
   if (charts.status) charts.status.destroy();
-  charts.status = new Chart(ctx2, { type:'doughnut', data: { labels: Object.keys(status), datasets: [{ data: Object.values(status), backgroundColor: ['#6366f1','#f59e0b','#22c55e','#ef4444'] }]}, options: { plugins: { legend: { position:'bottom', labels:{boxWidth:10,font:{size:10}} }}}});
+  charts.status = new Chart(ctx2, { type:'doughnut', data: { labels: Object.keys(status), datasets: [{ data: Object.values(status), backgroundColor: ['#96655F','#f59e0b','#22c55e','#ef4444'] }]}, options: { plugins: { legend: { position:'bottom', labels:{boxWidth:10,font:{size:10}} }}}});
 
   // Prazos dashboard
   const prazos5 = db.prazos.filter(p => !p.concluido).sort((a,b) => a.data.localeCompare(b.data)).slice(0,5);
@@ -1714,7 +2008,7 @@ function renderDBStatus() {
   const el = document.getElementById('db-status');
   if (!el) return;
   const items = [
-    { label: 'Clientes',    val: db.clientes.length,    cor: 'indigo' },
+    { label: 'Clientes',    val: db.clientes.length,    cor: 'rose' },
     { label: 'Processos',   val: db.processos.length,   cor: 'blue'   },
     { label: 'Prazos',      val: db.prazos.filter(p=>!p.concluido).length, cor: 'red' },
     { label: 'Compromissos',val: db.compromissos.length, cor: 'purple' },
@@ -1834,7 +2128,7 @@ async function buscarDJEN(dias = 2) {
   const btn = document.getElementById('btn-buscar-djen');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Buscando...';
   btn.disabled = true;
-  document.getElementById('djen-lista').innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-3xl mb-3 block text-indigo-300"></i><p>Consultando o DJEN...</p></div>';
+  document.getElementById('djen-lista').innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-3xl mb-3 block text-rose-200"></i><p>Consultando o DJEN...</p></div>';
 
   const hoje = new Date();
   const inicio = new Date(hoje);
@@ -1894,11 +2188,11 @@ function processarPublicacoesDJEN(items, hoje) {
     const urgencia = diasRestam !== null ? (diasRestam <= 3 ? 'red' : diasRestam <= 7 ? 'yellow' : 'green') : 'gray';
     const badgePrazo = dataFatal ? `<span class="badge badge-${urgencia === 'red' ? 'red' : urgencia === 'yellow' ? 'yellow' : 'green'}">${diasRestam}d — ${new Date(dataFatal+'T12:00:00').toLocaleDateString('pt-BR')}</span>` : '<span class="badge badge-blue">Sem prazo identificado</span>';
 
-    return `<div class="border border-gray-200 rounded-xl p-4 hover:border-indigo-300 transition-all" id="pub-${idx}">
+    return `<div class="border border-gray-200 rounded-xl p-4 hover:border-rose-300 transition-all" id="pub-${idx}">
       <div class="flex items-start justify-between gap-4">
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2 mb-1 flex-wrap">
-            <span class="font-mono text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${numProc}</span>
+            <span class="font-mono text-xs font-semibold text-rose-800 bg-rose-50 px-2 py-0.5 rounded">${numProc}</span>
             <span class="text-xs text-gray-500">${tribunal}</span>
             <span class="text-xs text-gray-400">${new Date(dataDisp+'T12:00:00').toLocaleDateString('pt-BR')}</span>
           </div>
@@ -2203,7 +2497,7 @@ function renderHistoricoRelatorios() {
         <p class="text-xs text-gray-500">${r.fase.substring(0, 55)}... · ${r.data}</p>
       </div>
       <div class="flex gap-2">
-        <button onclick="visualizarHistorico(${r.id})" class="text-indigo-500 hover:text-indigo-700 text-xs"><i class="fas fa-eye"></i></button>
+        <button onclick="visualizarHistorico(${r.id})" class="text-rose-600 hover:text-rose-800 text-xs"><i class="fas fa-eye"></i></button>
         <button onclick="excluirHistorico(${r.id})" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash"></i></button>
       </div>
     </div>`).join('');
@@ -2256,7 +2550,7 @@ async function instalarApp() {
     const ctx = c.getContext('2d');
     // Fundo gradiente roxo
     const g = ctx.createLinearGradient(0, 0, size, size);
-    g.addColorStop(0, '#4338ca'); g.addColorStop(1, '#1e1b4b');
+    g.addColorStop(0, '#7a504b'); g.addColorStop(1, '#1e1b4b');
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.roundRect(0, 0, size, size, size * 0.18);

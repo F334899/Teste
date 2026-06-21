@@ -4,8 +4,8 @@
   "description": "Sistema de gestão jurídica — Flaviane Bilhar Caler OAB SC054395",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#312e81",
-  "theme_color": "#312e81",
+  "background_color": "#96655F",
+  "theme_color": "#96655F",
   "orientation": "landscape",
   "icons": [
     {
