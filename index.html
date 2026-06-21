@@ -3,7 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escritório Jurídico — Direito da Saúde & Previdenciário</title>
+<title>Meu Escritório — Flaviane Bilhar Caler</title>
+<meta name="description" content="Sistema de gestão jurídica — Direito da Saúde & Previdenciário">
+<meta name="theme-color" content="#312e81">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meu Escritório">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Quattrocento+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -139,6 +147,9 @@
     </div>
     <div class="flex items-center gap-3">
       <span class="text-gray-400 text-sm" id="current-date"></span>
+      <button id="btn-instalar" onclick="instalarApp()" class="btn text-sm hidden" style="background:#312e81;color:white;">
+        <i class="fas fa-download mr-1"></i> Instalar como App
+      </button>
       <button onclick="openModal('modal-config')" class="btn btn-secondary text-sm">
         <i class="fas fa-cog mr-1"></i> Configurações
       </button>
@@ -2020,6 +2031,83 @@ function excluirHistorico(id) {
   db.historico_relatorios = (db.historico_relatorios || []).filter(r => r.id !== id);
   saveDB(); renderHistoricoRelatorios(); toast('Removido do histórico');
 }
+
+// ==================== PWA — INSTALAÇÃO ====================
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('btn-instalar').classList.remove('hidden');
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('btn-instalar').classList.add('hidden');
+  deferredPrompt = null;
+  toast('App instalado com sucesso! Procure o ícone na sua área de trabalho.');
+});
+
+async function instalarApp() {
+  if (!deferredPrompt) {
+    toast('Use o menu do Chrome (⋮) → "Instalar Escritório Jurídico"', 'err');
+    return;
+  }
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') toast('Instalando... verifique sua área de trabalho!');
+  deferredPrompt = null;
+  document.getElementById('btn-instalar').classList.add('hidden');
+}
+
+// Gera ícones e registra Service Worker
+(function iniciarPWA() {
+  // Gera ícones via Canvas e salva como blob URLs
+  function gerarIcone(size) {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    // Fundo gradiente roxo
+    const g = ctx.createLinearGradient(0, 0, size, size);
+    g.addColorStop(0, '#4338ca'); g.addColorStop(1, '#1e1b4b');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.roundRect(0, 0, size, size, size * 0.18);
+    ctx.fill();
+    // Ícone balança (símbolo ⚖)
+    ctx.fillStyle = 'white';
+    ctx.font = `bold ${size * 0.45}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⚖', size / 2, size / 2);
+    return c.toDataURL('image/png');
+  }
+
+  // Injeta ícones no manifest dinamicamente
+  try {
+    const icon192 = gerarIcone(192);
+    const icon512 = gerarIcone(512);
+    // Adiciona link apple-touch-icon dinâmico
+    const appleLink = document.querySelector('link[rel="apple-touch-icon"]');
+    if (appleLink) appleLink.href = icon192;
+    // Patch no manifest para usar data URLs
+    const manifestEl = document.querySelector('link[rel="manifest"]');
+    if (manifestEl) {
+      fetch('./manifest.json').then(r => r.json()).then(mf => {
+        mf.icons = [
+          { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+        ];
+        const blob = new Blob([JSON.stringify(mf)], { type: 'application/json' });
+        manifestEl.href = URL.createObjectURL(blob);
+      }).catch(() => {});
+    }
+  } catch(e) {}
+
+  // Registra Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+})();
 
 // ==================== INIT ====================
 document.getElementById('current-date').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});

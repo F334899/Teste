@@ -1,0 +1,44 @@
+{
+  "name": "Escritório Jurídico — Direito da Saúde & Previdenciário",
+  "short_name": "Meu Escritório",
+  "description": "Sistema de gestão jurídica — Flaviane Bilhar Caler OAB SC054395",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#312e81",
+  "theme_color": "#312e81",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Monitor DJEN",
+      "short_name": "DJEN",
+      "description": "Abrir monitor de publicações",
+      "url": "./index.html#djen"
+    },
+    {
+      "name": "Prazos Urgentes",
+      "short_name": "Prazos",
+      "description": "Ver prazos críticos",
+      "url": "./index.html#prazos"
+    },
+    {
+      "name": "Novo Cliente",
+      "short_name": "Cliente",
+      "description": "Cadastrar novo cliente",
+      "url": "./index.html#clientes"
+    }
+  ]
+}
