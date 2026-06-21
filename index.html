@@ -42,6 +42,18 @@
   .prazo-ok { border-left: 4px solid #22c55e; }
   .agent-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
   .agent-card { transition: all 0.2s; cursor: pointer; }
+  /* Relatório de Andamento */
+  .relatorio-doc { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.8; color: #111; }
+  .relatorio-doc h1 { font-size: 13pt; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 6px; }
+  .relatorio-doc h2 { font-size: 12pt; font-weight: bold; text-transform: uppercase; margin-top: 18px; margin-bottom: 6px; }
+  .relatorio-doc h3 { font-size: 12pt; font-weight: bold; margin-top: 12px; margin-bottom: 4px; }
+  .relatorio-doc p { margin-bottom: 10px; text-align: justify; }
+  .relatorio-doc .cabecalho { text-align: center; border-bottom: 2px solid #111; padding-bottom: 14px; margin-bottom: 20px; }
+  .relatorio-doc .rodape { text-align: center; border-top: 1px solid #111; padding-top: 14px; margin-top: 30px; font-size: 11pt; }
+  .relatorio-doc .sumario-box { border: 1px solid #ccc; padding: 14px; margin: 16px 0; background: #fafafa; }
+  .relatorio-doc ul { padding-left: 22px; margin-bottom: 10px; }
+  .relatorio-doc ul li { margin-bottom: 4px; }
+  .relatorio-doc .destaque { background: #fff8dc; border-left: 4px solid #e6ac00; padding: 8px 12px; margin: 10px 0; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: #f1f5f9; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
@@ -92,6 +104,9 @@
     <p class="text-indigo-400 text-xs font-semibold uppercase px-3 pt-3 pb-1">Ferramentas</p>
     <a onclick="showSection('documentos')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-documentos">
       <i class="fas fa-file-alt w-4"></i> Documentos & IA
+    </a>
+    <a onclick="showSection('relatorio')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-relatorio">
+      <i class="fas fa-file-signature w-4"></i> Relatório Andamento
     </a>
     <a onclick="showSection('integracoes')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-integracoes">
       <i class="fas fa-plug w-4"></i> Integrações
@@ -363,6 +378,145 @@
         <button onclick="filtrarAgentes('recurso')" class="btn btn-secondary text-xs">📨 Recursos</button>
       </div>
       <div id="grid-agentes" class="grid grid-cols-3 gap-3"></div>
+    </div>
+  </div>
+
+  <!-- ===== RELATÓRIO DE ANDAMENTO PROCESSUAL ===== -->
+  <div id="section-relatorio" class="section">
+    <div class="grid grid-cols-5 gap-4">
+
+      <!-- Formulário -->
+      <div class="col-span-2 space-y-4">
+        <div class="card p-5">
+          <h3 class="font-semibold text-gray-700 mb-4 flex items-center gap-2"><i class="fas fa-edit text-indigo-500"></i> Dados do Relatório</h3>
+          <div class="space-y-3 text-sm">
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Cliente *</label>
+              <select id="rel-cliente" onchange="autoPreencherCliente()" class="text-sm">
+                <option value="">Selecione o cliente...</option>
+              </select>
+            </div>
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Número do Processo *</label>
+              <input id="rel-processo" placeholder="0000000-00.0000.0.00.0000">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="text-xs text-gray-500 mb-1 block font-medium">Vara / Juízo</label>
+                <input id="rel-vara" placeholder="Ex: 1ª Vara Federal de Chapecó/SC">
+              </div>
+              <div><label class="text-xs text-gray-500 mb-1 block font-medium">Réu / Parte Contrária</label>
+                <input id="rel-reu" placeholder="Ex: INSS / União Federal / Plano X">
+              </div>
+            </div>
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Tipo de Ação</label>
+              <select id="rel-tipo-acao">
+                <option>Ação de Concessão de Benefício Previdenciário</option>
+                <option>Ação de Concessão de BPC/LOAS</option>
+                <option>Ação de Concessão de Auxílio-Doença</option>
+                <option>Ação de Revisão de Benefício Previdenciário</option>
+                <option>Ação de Obrigação de Fazer — Fornecimento de Medicamento</option>
+                <option>Ação de Obrigação de Fazer — Plano de Saúde</option>
+                <option>Ação Indenizatória — Erro Médico</option>
+                <option>Ação de Cumprimento de Sentença</option>
+                <option>Recurso de Apelação</option>
+                <option>Recurso ao CRPS — INSS</option>
+                <option>Mandado de Segurança</option>
+              </select>
+            </div>
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Fase Processual Atual</label>
+              <select id="rel-fase">
+                <option>Petição inicial protocolada — aguardando designação de juízo</option>
+                <option>Citação da parte ré — aguardando contestação</option>
+                <option>Em fase de instrução probatória</option>
+                <option>Aguardando realização de perícia médica</option>
+                <option>Perícia médica realizada — aguardando laudo</option>
+                <option>Laudo pericial juntado aos autos — aguardando sentença</option>
+                <option>Sentença proferida — favorável ao cliente</option>
+                <option>Sentença proferida — desfavorável — recurso em andamento</option>
+                <option>Em fase recursal — aguardando julgamento pelo Tribunal</option>
+                <option>Acórdão publicado — trânsito em julgado pendente</option>
+                <option>Processo em fase de execução/cumprimento de sentença</option>
+                <option>Implantação do benefício determinada — aguardando INSS</option>
+                <option>Processo encerrado — êxito obtido</option>
+              </select>
+            </div>
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Última Movimentação</label>
+              <input id="rel-ultima-mov" placeholder="Ex: Juntada de laudo pericial em 15/06/2026">
+            </div>
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Data da Última Movimentação</label>
+              <input type="date" id="rel-data-mov">
+            </div>
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Próxima Etapa Prevista</label>
+              <input id="rel-proxima" placeholder="Ex: Audiência de instrução designada para 20/08/2026">
+            </div>
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Perspectivas / Análise Jurídica</label>
+              <select id="rel-perspectiva">
+                <option value="favoravel">Favorável — sólidos fundamentos jurídicos e fáticos</option>
+                <option value="parcial">Parcialmente favorável — aspectos a superar</option>
+                <option value="aguardando">Em análise — aguardando elementos probatórios</option>
+                <option value="recurso">Em recurso — posição jurídica consolidada</option>
+              </select>
+            </div>
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Observações Adicionais ao Cliente</label>
+              <textarea id="rel-obs" rows="3" placeholder="Informações complementares, orientações ao cliente, documentos necessários..."></textarea>
+            </div>
+
+            <div><label class="text-xs text-gray-500 mb-1 block font-medium">Precisa de Documento do Cliente?</label>
+              <input id="rel-doc-necessario" placeholder="Ex: Laudo médico atualizado, CTPS, extrato CNIS">
+            </div>
+
+          </div>
+          <div class="flex gap-2 mt-4">
+            <button onclick="gerarRelatorio()" class="btn btn-primary flex-1">
+              <i class="fas fa-file-alt mr-2"></i>Gerar Relatório
+            </button>
+            <button onclick="imprimirRelatorio()" class="btn btn-secondary" title="Imprimir / Salvar PDF">
+              <i class="fas fa-print"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview do Relatório -->
+      <div class="col-span-3">
+        <div class="card p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-eye text-indigo-500"></i> Pré-visualização</h3>
+            <div class="flex gap-2">
+              <button onclick="copiarRelatorio()" class="btn btn-secondary text-xs"><i class="fas fa-copy mr-1"></i>Copiar</button>
+              <button onclick="salvarRelatorioHistorico()" class="btn btn-secondary text-xs"><i class="fas fa-save mr-1"></i>Salvar Histórico</button>
+              <button onclick="imprimirRelatorio()" class="btn btn-primary text-xs"><i class="fas fa-print mr-1"></i>PDF / Imprimir</button>
+            </div>
+          </div>
+          <div id="relatorio-preview" class="bg-white border border-gray-200 rounded-lg p-8 min-h-[600px] overflow-auto">
+            <div class="text-center text-gray-400 py-20">
+              <i class="fas fa-file-signature text-5xl mb-4 block text-gray-200"></i>
+              <p>Preencha os dados ao lado e clique em <strong>Gerar Relatório</strong></p>
+              <p class="text-xs mt-2">O documento será gerado no padrão do escritório</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Histórico de Relatórios -->
+        <div class="card p-5 mt-4">
+          <h3 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <i class="fas fa-history text-gray-400"></i> Histórico de Relatórios Gerados
+            <span class="badge badge-blue ml-auto" id="cnt-relatorios">0</span>
+          </h3>
+          <div id="historico-relatorios" class="space-y-2 text-sm text-gray-500">
+            <p class="text-center py-3 text-gray-400">Nenhum relatório salvo</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -688,6 +842,7 @@ function showSection(name) {
     agenda: ['Agenda', 'Compromissos e audiências'],
     financeiro: ['Financeiro', 'Honorários e cobranças'],
     documentos: ['Documentos & IA', '57 modelos com inteligência artificial'],
+    relatorio: ['Relatório de Andamento Processual', 'Gerador de relatórios para clientes — padrão do escritório'],
     integracoes: ['Integrações', 'Google Drive, Notion e Google Calendar']
   };
   document.getElementById('page-title').textContent = titles[name][0];
@@ -699,6 +854,7 @@ function showSection(name) {
   if (name === 'agenda') renderCalendario();
   if (name === 'financeiro') renderFinanceiro();
   if (name === 'documentos') renderAgentes();
+  if (name === 'relatorio') { popularSelectRelatorio(); renderHistoricoRelatorios(); }
 }
 
 // ==================== MODAL ====================
@@ -1172,6 +1328,219 @@ async function listarEventosCalendario() {
   document.getElementById('gcal-events').innerHTML = '<p class="text-gray-400">Carregando...</p>';
   toast('Conectando ao Google Calendar...');
   document.getElementById('gcal-events').innerHTML = '<p class="text-gray-500">✓ Google Calendar conectado. Compromissos serão sincronizados automaticamente.</p>';
+}
+
+// ==================== RELATÓRIO DE ANDAMENTO PROCESSUAL ====================
+
+function popularSelectRelatorio() {
+  const sel = document.getElementById('rel-cliente');
+  sel.innerHTML = '<option value="">Selecione o cliente...</option>';
+  db.clientes.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`);
+}
+
+function autoPreencherCliente() {
+  const id = document.getElementById('rel-cliente').value;
+  const c = db.clientes.find(c => c.id == id);
+  if (!c) return;
+  // Tenta preencher processo vinculado
+  const proc = db.processos.find(p => p.clienteId == id);
+  if (proc) {
+    document.getElementById('rel-processo').value = proc.numero;
+    document.getElementById('rel-vara').value = proc.tribunal;
+  }
+}
+
+const perspMap = {
+  favoravel: 'O quadro jurídico-fático apresenta-se <strong>favorável</strong> aos interesses do(a) cliente. Os fundamentos de direito encontram sólido amparo na legislação vigente, na jurisprudência consolidada dos Tribunais Superiores e na prova dos autos, indicando perspectiva positiva de êxito.',
+  parcial: 'O quadro jurídico-fático apresenta aspectos <strong>parcialmente favoráveis</strong>. Há elementos consistentes em favor da pretensão, muito embora alguns pontos de fato ou de direito demandem atenção especial ao longo da instrução processual.',
+  aguardando: 'O processo encontra-se em fase de formação probatória, razão pela qual a análise das perspectivas <strong>permanece em desenvolvimento</strong>. Os elementos probatórios produzidos até o momento são compatíveis com a pretensão deduzida, aguardando-se a complementação do acervo para posicionamento mais preciso.',
+  recurso: 'Em sede recursal, mantém-se <strong>posição jurídica consolidada</strong>, fundamentada em entendimento doutrinário e jurisprudencial que ampara os interesses do(a) cliente. A jurisprudência dos Tribunais Superiores é favorável à tese sustentada nestes autos.'
+};
+
+function gerarRelatorio() {
+  const clienteId = document.getElementById('rel-cliente').value;
+  const cliente = db.clientes.find(c => c.id == clienteId);
+  const nomeCliente = cliente ? cliente.nome.toUpperCase() : '[NOME DO CLIENTE]';
+  const nomeClienteNormal = cliente ? cliente.nome : '[Nome do Cliente]';
+  const cpf = cliente ? (cliente.cpf || 'não informado') : 'não informado';
+
+  const numProc = document.getElementById('rel-processo').value || '[NÚMERO DO PROCESSO]';
+  const vara = document.getElementById('rel-vara').value || '[VARA / JUÍZO]';
+  const reu = document.getElementById('rel-reu').value || '[PARTE RÉ]';
+  const tipoAcao = document.getElementById('rel-tipo-acao').value;
+  const faseAtual = document.getElementById('rel-fase').value;
+  const ultimaMov = document.getElementById('rel-ultima-mov').value || 'Andamento em verificação';
+  const dataMovRaw = document.getElementById('rel-data-mov').value;
+  const dataMov = dataMovRaw ? new Date(dataMovRaw + 'T00:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+  const proxEtapa = document.getElementById('rel-proxima').value || 'A ser comunicada oportunamente';
+  const perspKey = document.getElementById('rel-perspectiva').value;
+  const perspTexto = perspMap[perspKey];
+  const obsCliente = document.getElementById('rel-obs').value;
+  const docNecessario = document.getElementById('rel-doc-necessario').value;
+
+  const cfg = db.config;
+  const nomeEscritorio = cfg.nome || 'ESCRITÓRIO DE ADVOCACIA';
+  const oab = cfg.oab || 'OAB/SC';
+  const telEscritorioDisplay = cfg.tel || '';
+  const emailEscritorio = cfg.email || '';
+  const hoje = new Date().toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'});
+
+  const docNecessarioBloco = docNecessario ? `
+    <h2>5. PROVIDÊNCIAS NECESSÁRIAS POR PARTE DO(A) CLIENTE</h2>
+    <p>Para o prosseguimento adequado das medidas jurídicas cabíveis e em atenção à necessidade de complementação probatória, solicita-se ao(à) Sr.(a) <strong>${nomeClienteNormal}</strong> a providência dos seguintes documentos/informações:</p>
+    <ul><li>${docNecessario}</li></ul>
+    <p>Solicita-se, por gentileza, que o(s) documento(s) acima indicado(s) seja(m) encaminhado(s) ao escritório com a maior brevidade possível, a fim de não comprometer o andamento das medidas adotadas.</p>` : '';
+
+  const obsBloco = obsCliente ? `
+    <h2>${docNecessario ? '6' : '5'}. INFORMAÇÕES COMPLEMENTARES</h2>
+    <p>${obsCliente}</p>` : '';
+
+  const secNum = docNecessario && obsCliente ? 7 : docNecessario || obsCliente ? 6 : 5;
+
+  const html = `<div class="relatorio-doc" id="doc-para-imprimir">
+
+  <div class="cabecalho">
+    <h1>${nomeEscritorio}</h1>
+    <p style="font-size:11pt; margin:2px 0;">${oab}${telEscritorioDisplay ? ' &nbsp;|&nbsp; ' + telEscritorioDisplay : ''}${emailEscritorio ? ' &nbsp;|&nbsp; ' + emailEscritorio : ''}</p>
+    <p style="font-size:11pt; margin:2px 0;"><strong>Direito da Saúde &amp; Direito Previdenciário</strong></p>
+  </div>
+
+  <h1>RELATÓRIO DE ANDAMENTO PROCESSUAL</h1>
+  <p style="text-align:center; font-size:11pt; margin-bottom: 4px;"><strong>Cliente:</strong> ${nomeClienteNormal} &nbsp;|&nbsp; <strong>CPF:</strong> ${cpf}</p>
+  <p style="text-align:center; font-size:11pt; margin-bottom: 16px;"><strong>Data de emissão:</strong> ${hoje}</p>
+
+  <div class="sumario-box">
+    <p style="font-weight:bold; margin-bottom:8px;">SUMÁRIO DO PROCESSO</p>
+    <table style="width:100%; font-size:11pt; border-collapse:collapse;">
+      <tr><td style="padding:3px 8px; width:40%;"><strong>Tipo de Ação</strong></td><td style="padding:3px 8px;">${tipoAcao}</td></tr>
+      <tr style="background:#f5f5f5;"><td style="padding:3px 8px;"><strong>Nº do Processo</strong></td><td style="padding:3px 8px; font-family:monospace;">${numProc}</td></tr>
+      <tr><td style="padding:3px 8px;"><strong>Juízo / Vara</strong></td><td style="padding:3px 8px;">${vara}</td></tr>
+      <tr style="background:#f5f5f5;"><td style="padding:3px 8px;"><strong>Parte Requerida</strong></td><td style="padding:3px 8px;">${reu}</td></tr>
+      <tr><td style="padding:3px 8px;"><strong>Fase Atual</strong></td><td style="padding:3px 8px;">${faseAtual}</td></tr>
+    </table>
+  </div>
+
+  <h2>1. ESCLARECIMENTO PRELIMINAR</h2>
+  <p>Prezado(a) Sr.(a) <strong>${nomeClienteNormal}</strong>,</p>
+  <p>O presente relatório tem por finalidade mantê-lo(a) devidamente informado(a) acerca do estado atual do processo que tramita em seu favor perante ${vara}, sob o número <strong>${numProc}</strong>, bem como prestar os esclarecimentos necessários sobre as próximas etapas processuais.</p>
+  <p>Este escritório reitera seu compromisso com a transparência e com a comunicação clara e tempestiva de todos os desdobramentos que venham a ocorrer nos autos, assegurando que V.Sa. disponha das informações indispensáveis para compreender o andamento das medidas jurídicas adotadas em sua defesa.</p>
+
+  <h2>2. SITUAÇÃO ATUAL DO PROCESSO</h2>
+  <h3>2.1 Fase Processual</h3>
+  <p>O processo encontra-se, neste momento, na seguinte fase: <strong>${faseAtual}</strong>.</p>
+
+  <h3>2.2 Última Movimentação Verificada</h3>
+  <p>A última movimentação registrada nos autos data de <strong>${dataMov}</strong>, consistente em: <strong>${ultimaMov}</strong>.</p>
+  <p>Cumpre esclarecer que o andamento dos processos judiciais obedece ao ritmo e à pauta estabelecidos pelo Poder Judiciário, não cabendo ao advogado interferir nos prazos internos dos órgãos competentes. Este escritório acompanha os autos de forma contínua e diligente, comunicando V.Sa. imediatamente na ocorrência de qualquer movimentação relevante.</p>
+
+  <h2>3. PRÓXIMA ETAPA PROCESSUAL</h2>
+  <p>A próxima etapa aguardada no curso processual é a seguinte: <strong>${proxEtapa}</strong>.</p>
+  <p>Este escritório adotará, no momento oportuno, todas as providências advocatícias cabíveis, zelando pelos interesses de V.Sa. com a diligência e o comprometimento que o caso requer.</p>
+
+  <h2>4. ANÁLISE JURÍDICA E PERSPECTIVAS</h2>
+  <p>${perspTexto}</p>
+  <p>Ressalta-se, contudo, que qualquer avaliação de perspectivas, por mais embasada que seja, não configura garantia de resultado, porquanto os desfechos processuais dependem de uma pluralidade de fatores — inclusive elementos probatórios e avaliação judicial —, os quais não estão inteiramente sob o controle desta representação legal. Este escritório, todavia, permanece empenhado na adoção de todas as estratégias jurídicas adequadas à máxima tutela dos direitos de V.Sa.</p>
+
+  ${docNecessarioBloco}
+  ${obsBloco}
+
+  <h2>${secNum}. ORIENTAÇÕES GERAIS</h2>
+  <ul>
+    <li>Em caso de dúvidas sobre o andamento do processo, entre em contato com este escritório pelos canais abaixo indicados;</li>
+    <li>Caso V.Sa. receba qualquer correspondência, citação, intimação ou notificação relacionada ao presente processo, comunique imediatamente este escritório, sem responder ou assinar qualquer documento;</li>
+    <li>Informe ao escritório qualquer alteração em seus dados pessoais (endereço, telefone, e-mail), bem como qualquer alteração relevante em sua condição de saúde ou situação previdenciária;</li>
+    <li>Guarde todos os documentos relacionados ao processo e ao seu estado de saúde/situação previdenciária, pois poderão ser necessários ao longo da instrução processual.</li>
+  </ul>
+
+  <div class="rodape">
+    <p><strong>${nomeEscritorio}</strong><br>
+    ${oab}${telEscritorioDisplay ? ' &nbsp;|&nbsp; Tel: ' + telEscritorioDisplay : ''}${emailEscritorio ? ' &nbsp;|&nbsp; ' + emailEscritorio : ''}</p>
+    <p style="font-size:10pt; color:#555; margin-top:8px;"><em>Este relatório é documento confidencial, destinado exclusivamente ao(à) cliente identificado(a) no cabeçalho.<br>
+    Eventuais dúvidas deverão ser esclarecidas diretamente com este escritório.</em></p>
+  </div>
+</div>`;
+
+  document.getElementById('relatorio-preview').innerHTML = html;
+  toast('Relatório gerado com sucesso!');
+}
+
+function imprimirRelatorio() {
+  const conteudo = document.getElementById('doc-para-imprimir');
+  if (!conteudo) { toast('Gere o relatório primeiro', 'err'); return; }
+  const janela = window.open('', '_blank');
+  janela.document.write(`<!DOCTYPE html><html lang="pt-BR"><head>
+    <meta charset="UTF-8"><title>Relatório de Andamento Processual</title>
+    <style>
+      body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.8; color: #111; margin: 2cm 2.5cm; }
+      h1 { font-size: 13pt; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 6px; }
+      h2 { font-size: 12pt; font-weight: bold; text-transform: uppercase; margin-top: 18px; margin-bottom: 6px; page-break-after: avoid; }
+      h3 { font-size: 12pt; font-weight: bold; margin-top: 12px; margin-bottom: 4px; }
+      p { margin-bottom: 10px; text-align: justify; }
+      .cabecalho { text-align: center; border-bottom: 2px solid #111; padding-bottom: 14px; margin-bottom: 20px; }
+      .rodape { text-align: center; border-top: 1px solid #111; padding-top: 14px; margin-top: 30px; font-size: 11pt; }
+      .sumario-box { border: 1px solid #aaa; padding: 14px; margin: 16px 0; }
+      table { width: 100%; border-collapse: collapse; font-size: 11pt; }
+      td { padding: 4px 8px; }
+      ul { padding-left: 22px; margin-bottom: 10px; }
+      ul li { margin-bottom: 4px; }
+      @page { margin: 2cm 2.5cm; }
+      @media print { body { margin: 0; } }
+    </style></head><body>${conteudo.innerHTML}</body></html>`);
+  janela.document.close();
+  janela.focus();
+  setTimeout(() => janela.print(), 500);
+}
+
+function copiarRelatorio() {
+  const el = document.getElementById('doc-para-imprimir');
+  if (!el) { toast('Gere o relatório primeiro', 'err'); return; }
+  navigator.clipboard.writeText(el.innerText).then(() => toast('Texto copiado para a área de transferência!'));
+}
+
+function salvarRelatorioHistorico() {
+  const el = document.getElementById('doc-para-imprimir');
+  if (!el) { toast('Gere o relatório primeiro', 'err'); return; }
+  const clienteId = document.getElementById('rel-cliente').value;
+  const cliente = db.clientes.find(c => c.id == clienteId);
+  if (!db.historico_relatorios) db.historico_relatorios = [];
+  db.historico_relatorios.unshift({
+    id: Date.now(),
+    clienteNome: cliente ? cliente.nome : '—',
+    processo: document.getElementById('rel-processo').value || '—',
+    fase: document.getElementById('rel-fase').value,
+    data: new Date().toLocaleDateString('pt-BR'),
+    html: el.outerHTML
+  });
+  saveDB(); renderHistoricoRelatorios(); toast('Relatório salvo no histórico!');
+}
+
+function renderHistoricoRelatorios() {
+  const lista = db.historico_relatorios || [];
+  document.getElementById('cnt-relatorios').textContent = lista.length;
+  const el = document.getElementById('historico-relatorios');
+  if (!lista.length) { el.innerHTML = '<p class="text-center py-3 text-gray-400">Nenhum relatório salvo</p>'; return; }
+  el.innerHTML = lista.slice(0, 10).map(r => `
+    <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+      <div>
+        <p class="font-medium text-gray-800 text-xs">${r.clienteNome} — ${r.processo}</p>
+        <p class="text-xs text-gray-500">${r.fase.substring(0, 55)}... · ${r.data}</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="visualizarHistorico(${r.id})" class="text-indigo-500 hover:text-indigo-700 text-xs"><i class="fas fa-eye"></i></button>
+        <button onclick="excluirHistorico(${r.id})" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function visualizarHistorico(id) {
+  const r = (db.historico_relatorios || []).find(r => r.id === id);
+  if (!r) return;
+  document.getElementById('relatorio-preview').innerHTML = r.html;
+  toast('Relatório carregado!');
+}
+function excluirHistorico(id) {
+  db.historico_relatorios = (db.historico_relatorios || []).filter(r => r.id !== id);
+  saveDB(); renderHistoricoRelatorios(); toast('Removido do histórico');
 }
 
 // ==================== INIT ====================
