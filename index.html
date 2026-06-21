@@ -81,6 +81,10 @@
 
   <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
     <p class="text-indigo-400 text-xs font-semibold uppercase px-3 pt-2 pb-1">Principal</p>
+    <a onclick="showSection('djen')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-djen">
+      <i class="fas fa-satellite-dish w-4"></i> Monitor DJEN
+      <span class="ml-auto bg-yellow-400 text-yellow-900 text-xs rounded-full px-1.5 py-0.5 hidden" id="badge-djen">0</span>
+    </a>
     <a onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-dashboard">
       <i class="fas fa-chart-pie w-4"></i> Dashboard
     </a>
@@ -380,6 +384,88 @@
         <button onclick="filtrarAgentes('recurso')" class="btn btn-secondary text-xs">📨 Recursos</button>
       </div>
       <div id="grid-agentes" class="grid grid-cols-3 gap-3"></div>
+    </div>
+  </div>
+
+  <!-- ===== MONITOR DJEN ===== -->
+  <div id="section-djen" class="section">
+
+    <!-- Status bar -->
+    <div class="card p-4 mb-5 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+          <i class="fas fa-satellite-dish text-indigo-600"></i>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-800">Monitor DJEN — OAB SC054395</p>
+          <p class="text-xs text-gray-500" id="djen-ultima-busca">Nunca executado</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="text-right text-xs text-gray-500">
+          <p>Próxima busca automática</p>
+          <p class="font-semibold text-gray-700" id="djen-proxima">—</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="buscarDJEN(7)" class="btn btn-secondary text-sm">
+            <i class="fas fa-history mr-1"></i>Últimos 7 dias
+          </button>
+          <button onclick="buscarDJEN(2)" class="btn btn-primary text-sm" id="btn-buscar-djen">
+            <i class="fas fa-sync-alt mr-1"></i>Buscar Agora
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-4 gap-4 mb-5">
+      <div class="stat-card border-l-4 border-indigo-500">
+        <p class="text-xs text-gray-500 uppercase font-medium mb-1">Publicações Hoje</p>
+        <p class="text-3xl font-bold text-gray-800" id="djen-cnt-hoje">—</p>
+      </div>
+      <div class="stat-card border-l-4 border-red-500">
+        <p class="text-xs text-gray-500 uppercase font-medium mb-1">Prazos Gerados</p>
+        <p class="text-3xl font-bold text-gray-800" id="djen-cnt-prazos">—</p>
+      </div>
+      <div class="stat-card border-l-4 border-green-500">
+        <p class="text-xs text-gray-500 uppercase font-medium mb-1">Clientes Novos</p>
+        <p class="text-3xl font-bold text-gray-800" id="djen-cnt-clientes">—</p>
+      </div>
+      <div class="stat-card border-l-4 border-yellow-500">
+        <p class="text-xs text-gray-500 uppercase font-medium mb-1">Processos Novos</p>
+        <p class="text-3xl font-bold text-gray-800" id="djen-cnt-processos">—</p>
+      </div>
+    </div>
+
+    <!-- Log de publicações -->
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-gray-700 flex items-center gap-2">
+          <i class="fas fa-list text-indigo-400"></i> Publicações Encontradas
+        </h3>
+        <div class="flex gap-2">
+          <button onclick="importarTodosDJEN()" class="btn btn-green text-sm hidden" id="btn-importar-todos">
+            <i class="fas fa-file-import mr-1"></i>Importar Todos para o Sistema
+          </button>
+        </div>
+      </div>
+      <div id="djen-lista" class="space-y-3">
+        <div class="text-center py-12 text-gray-400">
+          <i class="fas fa-satellite-dish text-5xl mb-4 block text-gray-200"></i>
+          <p class="font-medium">Clique em "Buscar Agora" para consultar o DJEN</p>
+          <p class="text-sm mt-1">O sistema busca automaticamente todos os dias ao abrir</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log de execuções -->
+    <div class="card p-5 mt-4">
+      <h3 class="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+        <i class="fas fa-history text-gray-400"></i> Histórico de Buscas
+      </h3>
+      <div id="djen-historico" class="space-y-1 text-xs text-gray-500">
+        <p class="text-center py-3 text-gray-400">Nenhuma busca realizada ainda</p>
+      </div>
     </div>
   </div>
 
@@ -844,6 +930,7 @@ function showSection(name) {
     agenda: ['Agenda', 'Compromissos e audiências'],
     financeiro: ['Financeiro', 'Honorários e cobranças'],
     documentos: ['Documentos & IA', '57 modelos com inteligência artificial'],
+    djen: ['Monitor DJEN', 'Busca automática de publicações e prazos — OAB SC054395'],
     relatorio: ['Relatório de Andamento Processual', 'Gerador de relatórios para clientes — padrão do escritório'],
     integracoes: ['Integrações', 'Google Drive, Notion e Google Calendar']
   };
@@ -856,6 +943,7 @@ function showSection(name) {
   if (name === 'agenda') renderCalendario();
   if (name === 'financeiro') renderFinanceiro();
   if (name === 'documentos') renderAgentes();
+  if (name === 'djen') { renderHistoricoDJEN(); }
   if (name === 'relatorio') { popularSelectRelatorio(); renderHistoricoRelatorios(); }
 }
 
@@ -1332,6 +1420,281 @@ async function listarEventosCalendario() {
   document.getElementById('gcal-events').innerHTML = '<p class="text-gray-500">✓ Google Calendar conectado. Compromissos serão sincronizados automaticamente.</p>';
 }
 
+// ==================== MONITOR DJEN ====================
+
+const OAB_NUMERO = '54395';
+const OAB_UF = 'SC';
+
+// Feriados nacionais fixos (MM-DD)
+const FERIADOS_FIXOS = ['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'];
+// Recesso forense: 20/dez a 20/jan
+function isRecesso(d) {
+  const m = d.getMonth() + 1, dia = d.getDate();
+  return (m === 12 && dia >= 20) || (m === 1 && dia <= 20);
+}
+function isFeriado(d) {
+  const key = String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  return FERIADOS_FIXOS.includes(key);
+}
+function isDiaUtil(d) {
+  const dow = d.getDay();
+  return dow !== 0 && dow !== 6 && !isFeriado(d) && !isRecesso(d);
+}
+function adicionarDiasUteis(dataStr, dias) {
+  const d = new Date(dataStr + 'T12:00:00');
+  // O prazo começa no 1º dia útil SEGUINTE (CPC 224 §2)
+  d.setDate(d.getDate() + 1);
+  while (!isDiaUtil(d)) d.setDate(d.getDate() + 1);
+  let uteis = 0;
+  while (uteis < dias) {
+    if (isDiaUtil(d)) uteis++;
+    if (uteis < dias) d.setDate(d.getDate() + 1);
+  }
+  // Se cair em fds/feriado, avança
+  while (!isDiaUtil(d)) d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+}
+
+// Tipos de ato → prazo em dias úteis
+const PRAZOS_ATO = {
+  'contestação': 15, 'contestar': 15,
+  'apelação': 15, 'apelar': 15,
+  'agravo de instrumento': 15, 'agravo regimental': 15,
+  'embargos de declaração': 5, 'embargos': 5,
+  'manifestação': 5, 'manifestar': 5,
+  'contrarrazões': 15,
+  'recurso especial': 15, 'recurso extraordinário': 15,
+  'réplica': 15,
+  'impugnação': 15,
+  'memorial': 5,
+  'laudo': 10,
+  'petição': 5,
+};
+
+function detectarPrazo(texto) {
+  const t = texto.toLowerCase();
+  for (const [ato, dias] of Object.entries(PRAZOS_ATO)) {
+    if (t.includes(ato)) return { ato, dias };
+  }
+  // Busca padrão "prazo de X dias"
+  const m = t.match(/prazo\s+de\s+(\d+)\s+dias?\s+úteis?/);
+  if (m) return { ato: 'prazo', dias: parseInt(m[1]) };
+  return null;
+}
+
+function extrairNomeCliente(texto) {
+  // Tenta extrair nome após "autor:", "requerente:", "parte:"
+  const padroes = [
+    /requerente[:\s]+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ][a-záéíóúâêîôûãõç\s]+?)[\s,;]/,
+    /autor[:\s]+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ][a-záéíóúâêîôûãõç\s]+?)[\s,;]/,
+    /parte[:\s]+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ][a-záéíóúâêîôûãõç\s]+?)[\s,;]/,
+    /([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ]{2,}(?:\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇ]{2,}){1,5})\s+(?:x|vs?\.?|versus)\s/,
+  ];
+  for (const p of padroes) {
+    const m = texto.match(p);
+    if (m) return m[1].trim();
+  }
+  return null;
+}
+
+function extrairNumeroProcesso(texto) {
+  const m = texto.match(/\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}/);
+  return m ? m[0] : null;
+}
+
+let publicacoesDJEN = [];
+
+async function buscarDJEN(dias = 2) {
+  const btn = document.getElementById('btn-buscar-djen');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Buscando...';
+  btn.disabled = true;
+  document.getElementById('djen-lista').innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-spinner fa-spin text-3xl mb-3 block text-indigo-300"></i><p>Consultando o DJEN...</p></div>';
+
+  const hoje = new Date();
+  const inicio = new Date(hoje);
+  inicio.setDate(inicio.getDate() - dias);
+  const fmt = d => d.toISOString().split('T')[0];
+
+  try {
+    const url = `https://comunicaapi.pje.jus.br/api/v1/comunicacao?numeroOab=${OAB_NUMERO}&ufOab=${OAB_UF}&dataDisponibilizacaoInicio=${fmt(inicio)}&dataDisponibilizacaoFim=${fmt(hoje)}`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const items = data.items || data.content || data || [];
+    publicacoesDJEN = Array.isArray(items) ? items : [];
+    processarPublicacoesDJEN(publicacoesDJEN, fmt(hoje));
+    registrarHistoricoDJEN(publicacoesDJEN.length, fmt(hoje));
+  } catch (e) {
+    // API bloqueada neste ambiente — mostra instruções
+    document.getElementById('djen-lista').innerHTML = `
+      <div class="text-center py-8">
+        <i class="fas fa-wifi text-4xl text-yellow-400 mb-3 block"></i>
+        <p class="font-semibold text-gray-700 mb-1">API do CNJ inacessível neste ambiente</p>
+        <p class="text-sm text-gray-500 mb-4">A API funciona normalmente no seu navegador local.<br>Abra o arquivo <strong>index.html</strong> direto no seu computador para a automação completa.</p>
+        <button onclick="simularDJEN()" class="btn btn-primary text-sm">
+          <i class="fas fa-flask mr-1"></i>Simular com dados de exemplo
+        </button>
+      </div>`;
+    registrarHistoricoDJEN(0, fmt(hoje), 'Erro de rede — ambiente remoto');
+  }
+
+  btn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Buscar Agora';
+  btn.disabled = false;
+  document.getElementById('djen-ultima-busca').textContent = 'Última busca: ' + new Date().toLocaleString('pt-BR');
+  agendarProximaBusca();
+}
+
+function processarPublicacoesDJEN(items, hoje) {
+  let novosClientes = 0, novosProcessos = 0, novosPrazos = 0;
+  const hojeDate = new Date(hoje + 'T12:00:00');
+
+  document.getElementById('djen-cnt-hoje').textContent = items.length;
+
+  if (!items.length) {
+    document.getElementById('djen-lista').innerHTML = '<p class="text-center py-8 text-gray-400">Nenhuma publicação encontrada no período.</p>';
+    document.getElementById('btn-importar-todos').classList.add('hidden');
+    return;
+  }
+
+  const cards = items.map((pub, idx) => {
+    const texto = pub.texto || pub.conteudo || pub.descricao || JSON.stringify(pub);
+    const numProc = pub.numeroProcesso || extrairNumeroProcesso(texto) || '—';
+    const dataDisp = pub.dataDisponibilizacao || pub.data || hoje;
+    const tribunal = pub.siglaTribunal || pub.tribunal || pub.orgaoJulgador || '—';
+    const nomeCliente = pub.nomeAutor || pub.parte || extrairNomeCliente(texto) || '—';
+    const prazoInfo = detectarPrazo(texto);
+    const dataFatal = prazoInfo ? adicionarDiasUteis(dataDisp, prazoInfo.dias) : null;
+    const diasRestam = dataFatal ? Math.ceil((new Date(dataFatal+'T12:00:00') - hojeDate) / 86400000) : null;
+    const urgencia = diasRestam !== null ? (diasRestam <= 3 ? 'red' : diasRestam <= 7 ? 'yellow' : 'green') : 'gray';
+    const badgePrazo = dataFatal ? `<span class="badge badge-${urgencia === 'red' ? 'red' : urgencia === 'yellow' ? 'yellow' : 'green'}">${diasRestam}d — ${new Date(dataFatal+'T12:00:00').toLocaleDateString('pt-BR')}</span>` : '<span class="badge badge-blue">Sem prazo identificado</span>';
+
+    return `<div class="border border-gray-200 rounded-xl p-4 hover:border-indigo-300 transition-all" id="pub-${idx}">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <span class="font-mono text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${numProc}</span>
+            <span class="text-xs text-gray-500">${tribunal}</span>
+            <span class="text-xs text-gray-400">${new Date(dataDisp+'T12:00:00').toLocaleDateString('pt-BR')}</span>
+          </div>
+          <p class="font-medium text-gray-800 text-sm mb-1">${nomeCliente}</p>
+          <p class="text-xs text-gray-500 line-clamp-2">${texto.substring(0, 200)}${texto.length > 200 ? '...' : ''}</p>
+          ${prazoInfo ? `<p class="text-xs text-gray-600 mt-1">⚖️ Prazo: <strong>${prazoInfo.ato}</strong> — ${prazoInfo.dias} dias úteis</p>` : ''}
+        </div>
+        <div class="flex flex-col items-end gap-2 shrink-0">
+          ${badgePrazo}
+          <button onclick="importarPublicacao(${idx})" class="btn btn-primary text-xs py-1">
+            <i class="fas fa-file-import mr-1"></i>Importar
+          </button>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('djen-lista').innerHTML = cards.join('');
+  document.getElementById('btn-importar-todos').classList.remove('hidden');
+
+  // Atualiza badge do menu
+  const badge = document.getElementById('badge-djen');
+  badge.textContent = items.length;
+  badge.classList.remove('hidden');
+}
+
+function importarPublicacao(idx) {
+  const pub = publicacoesDJEN[idx];
+  if (!pub) return;
+  const texto = pub.texto || pub.conteudo || pub.descricao || '';
+  const numProc = pub.numeroProcesso || extrairNumeroProcesso(texto) || '';
+  const nomeCliente = pub.nomeAutor || pub.parte || extrairNomeCliente(texto) || 'Cliente DJEN';
+  const tribunal = pub.siglaTribunal || pub.tribunal || pub.orgaoJulgador || '';
+  const dataDisp = pub.dataDisponibilizacao || pub.data || new Date().toISOString().split('T')[0];
+  const prazoInfo = detectarPrazo(texto);
+
+  // Cadastra cliente se não existir
+  let cliente = db.clientes.find(c => c.nome.toLowerCase() === nomeCliente.toLowerCase());
+  if (!cliente) {
+    cliente = { id: Date.now(), nome: nomeCliente, cpf: '', area: 'Previdenciário', status: 'Ativo', tel: '', email: '', obs: 'Importado via DJEN', createdAt: new Date().toISOString() };
+    db.clientes.push(cliente);
+  }
+
+  // Cadastra processo se não existir
+  if (numProc && !db.processos.find(p => p.numero === numProc)) {
+    db.processos.push({ id: Date.now()+1, numero: numProc, clienteId: cliente.id, clienteNome: cliente.nome, area: 'Previdenciário', tribunal, fase: 'Em andamento', status: 'Em andamento', obs: texto.substring(0, 300), createdAt: new Date().toISOString() });
+  }
+
+  // Cadastra prazo se detectado
+  if (prazoInfo) {
+    const dataFatal = adicionarDiasUteis(dataDisp, prazoInfo.dias);
+    db.prazos.push({ id: Date.now()+2, desc: `${prazoInfo.ato.charAt(0).toUpperCase()+prazoInfo.ato.slice(1)} — ${numProc || nomeCliente}`, data: dataFatal, clienteNome: cliente.nome, tipo: 'Peça processual', concluido: false });
+  }
+
+  saveDB(); updateBadges();
+  document.getElementById(`pub-${idx}`).style.opacity = '0.4';
+  document.getElementById(`pub-${idx}`).querySelector('button').innerHTML = '<i class="fas fa-check mr-1"></i>Importado';
+  document.getElementById(`pub-${idx}`).querySelector('button').disabled = true;
+  toast(`✓ ${nomeCliente} importado com sucesso!`);
+}
+
+function importarTodosDJEN() {
+  publicacoesDJEN.forEach((_, idx) => importarPublicacao(idx));
+  document.getElementById('djen-cnt-clientes').textContent = db.clientes.length;
+  document.getElementById('djen-cnt-processos').textContent = db.processos.length;
+  document.getElementById('djen-cnt-prazos').textContent = db.prazos.filter(p => !p.concluido).length;
+  toast('Todos importados para o sistema!');
+}
+
+function registrarHistoricoDJEN(qtd, data, erro) {
+  if (!db.historico_djen) db.historico_djen = [];
+  db.historico_djen.unshift({ data, qtd, erro: erro || null, hora: new Date().toLocaleTimeString('pt-BR') });
+  if (db.historico_djen.length > 30) db.historico_djen = db.historico_djen.slice(0, 30);
+  saveDB();
+  const el = document.getElementById('djen-historico');
+  el.innerHTML = db.historico_djen.slice(0, 10).map(h => `
+    <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
+      <span class="${h.erro ? 'text-red-500' : 'text-gray-600'}">${h.erro ? '⚠ ' + h.erro : `✓ ${h.qtd} publicações encontradas`}</span>
+      <span class="text-gray-400">${h.data} às ${h.hora}</span>
+    </div>`).join('');
+}
+
+function agendarProximaBusca() {
+  const amanha = new Date();
+  amanha.setDate(amanha.getDate() + 1);
+  amanha.setHours(8, 0, 0, 0);
+  document.getElementById('djen-proxima').textContent = 'Amanhã às 08:00';
+  const ms = amanha - new Date();
+  setTimeout(() => buscarDJEN(2), ms);
+}
+
+function renderHistoricoDJEN() {
+  const el = document.getElementById('djen-historico');
+  if (!el) return;
+  const hist = db.historico_djen || [];
+  if (!hist.length) { el.innerHTML = '<p class="text-center py-3 text-gray-400">Nenhuma busca realizada ainda</p>'; return; }
+  el.innerHTML = hist.slice(0, 10).map(h => `
+    <div class="flex justify-between items-center py-1.5 border-b border-gray-50">
+      <span class="${h.erro ? 'text-red-500' : 'text-gray-600'}">${h.erro ? '⚠ ' + h.erro : `✓ ${h.qtd} publicações encontradas`}</span>
+      <span class="text-gray-400">${h.data} às ${h.hora}</span>
+    </div>`).join('');
+  const ultima = hist[0];
+  if (ultima) {
+    document.getElementById('djen-ultima-busca').textContent = `Última busca: ${ultima.data} às ${ultima.hora}`;
+    document.getElementById('djen-cnt-hoje').textContent = ultima.qtd;
+  }
+}
+
+// Dados simulados para teste no ambiente remoto
+function simularDJEN() {
+  publicacoesDJEN = [
+    { numeroProcesso: '5012345-67.2024.4.04.7201', nomeAutor: 'Maria José da Silva', siglaTribunal: 'TRF4', dataDisponibilizacao: new Date().toISOString().split('T')[0], texto: 'Intimação do(a) advogado(a) para apresentar contestação no prazo de 15 dias úteis. Processo de concessão de benefício previdenciário.' },
+    { numeroProcesso: '5098765-43.2025.4.04.7201', nomeAutor: 'João Pedro Souza', siglaTribunal: 'JEF Chapecó', dataDisponibilizacao: new Date().toISOString().split('T')[0], texto: 'Publicação de sentença favorável ao autor. Prazo para apelação de 15 dias úteis. Ação de concessão de BPC/LOAS.' },
+    { numeroProcesso: '5034521-89.2024.4.04.7201', nomeAutor: 'Ana Lucia Ferreira', siglaTribunal: 'TRF4', dataDisponibilizacao: new Date().toISOString().split('T')[0], texto: 'Intimação para manifestação sobre laudo pericial apresentado nos autos. Prazo de 5 dias úteis. Auxílio-doença por incapacidade.' },
+    { numeroProcesso: '5011122-33.2026.4.04.7201', nomeAutor: 'Carlos Alberto Nunes', siglaTribunal: 'TJSC', dataDisponibilizacao: new Date().toISOString().split('T')[0], texto: 'Designação de audiência de instrução e julgamento. Ação contra plano de saúde por negativa de cobertura cirúrgica.' },
+  ];
+  processarPublicacoesDJEN(publicacoesDJEN, new Date().toISOString().split('T')[0]);
+  registrarHistoricoDJEN(publicacoesDJEN.length, new Date().toISOString().split('T')[0]);
+  document.getElementById('djen-ultima-busca').textContent = 'Última busca: ' + new Date().toLocaleString('pt-BR') + ' (simulação)';
+  toast('Dados de simulação carregados!');
+}
+
 // ==================== RELATÓRIO DE ANDAMENTO PROCESSUAL ====================
 
 function popularSelectRelatorio() {
@@ -1537,6 +1900,20 @@ if (db.config.nome) document.querySelector('.sidebar h1').textContent = db.confi
 renderDashboard();
 updateBadges();
 renderAgentes();
+renderHistoricoDJEN();
+// Busca automática ao abrir (só em dias úteis, após 7h)
+(function autoBuscarDJEN() {
+  const agora = new Date();
+  const hora = agora.getHours();
+  if (isDiaUtil(agora) && hora >= 7) {
+    const ultimaBusca = db.historico_djen && db.historico_djen[0];
+    const hoje = agora.toISOString().split('T')[0];
+    if (!ultimaBusca || ultimaBusca.data !== hoje) {
+      setTimeout(() => buscarDJEN(2), 2000); // aguarda 2s para página carregar
+    }
+  }
+  agendarProximaBusca();
+})();
 </script>
 </body>
 </html>
