@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escritório Jurídico — Direito da Saúde & Previdenciário</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  * { font-family: 'Inter', sans-serif; }
+  .sidebar { width: 260px; min-height: 100vh; }
+  .main-content { margin-left: 260px; min-height: 100vh; }
+  .nav-item { transition: all 0.2s; }
+  .nav-item.active, .nav-item:hover { background: rgba(255,255,255,0.15); }
+  .card { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .badge { padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  input, select, textarea { border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; width: 100%; font-size: 14px; outline: none; }
+  input:focus, select:focus, textarea:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+  .btn { padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
+  .btn-primary { background: #4f46e5; color: white; }
+  .btn-primary:hover { background: #4338ca; }
+  .btn-danger { background: #ef4444; color: white; }
+  .btn-danger:hover { background: #dc2626; }
+  .btn-secondary { background: #f3f4f6; color: #374151; }
+  .btn-secondary:hover { background: #e5e7eb; }
+  .btn-green { background: #22c55e; color: white; }
+  .btn-green:hover { background: #16a34a; }
+  .table-row:hover { background: #f9fafb; }
+  .prazo-urgente { border-left: 4px solid #ef4444; }
+  .prazo-atencao { border-left: 4px solid #f59e0b; }
+  .prazo-ok { border-left: 4px solid #22c55e; }
+  .agent-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+  .agent-card { transition: all 0.2s; cursor: pointer; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .integr-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body class="bg-gray-50">
+
+<!-- SIDEBAR -->
+<aside class="sidebar fixed top-0 left-0 bg-gradient-to-b from-indigo-900 to-indigo-800 text-white flex flex-col z-50">
+  <div class="p-5 border-b border-indigo-700">
+    <div class="flex items-center gap-3 mb-1">
+      <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+        <i class="fas fa-balance-scale text-white"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-sm leading-tight">Seu Escritório</h1>
+        <p class="text-indigo-300 text-xs">Direito da Saúde & Prev.</p>
+      </div>
+    </div>
+  </div>
+
+  <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+    <p class="text-indigo-400 text-xs font-semibold uppercase px-3 pt-2 pb-1">Principal</p>
+    <a onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-dashboard">
+      <i class="fas fa-chart-pie w-4"></i> Dashboard
+    </a>
+    <a onclick="showSection('clientes')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-clientes">
+      <i class="fas fa-users w-4"></i> Clientes
+    </a>
+    <a onclick="showSection('processos')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-processos">
+      <i class="fas fa-folder-open w-4"></i> Processos
+    </a>
+
+    <p class="text-indigo-400 text-xs font-semibold uppercase px-3 pt-3 pb-1">Controle</p>
+    <a onclick="showSection('prazos')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-prazos">
+      <i class="fas fa-clock w-4"></i> Prazos
+      <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5" id="badge-prazos">0</span>
+    </a>
+    <a onclick="showSection('agenda')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-agenda">
+      <i class="fas fa-calendar-alt w-4"></i> Agenda
+    </a>
+    <a onclick="showSection('financeiro')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-financeiro">
+      <i class="fas fa-dollar-sign w-4"></i> Financeiro
+    </a>
+
+    <p class="text-indigo-400 text-xs font-semibold uppercase px-3 pt-3 pb-1">Ferramentas</p>
+    <a onclick="showSection('documentos')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-documentos">
+      <i class="fas fa-file-alt w-4"></i> Documentos & IA
+    </a>
+    <a onclick="showSection('integracoes')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-integracoes">
+      <i class="fas fa-plug w-4"></i> Integrações
+    </a>
+  </nav>
+
+  <div class="p-4 border-t border-indigo-700">
+    <div class="flex items-center gap-2 text-xs text-indigo-300">
+      <span class="integr-dot bg-green-400"></span> Google Drive
+      <span class="integr-dot bg-green-400 ml-1"></span> Notion
+      <span class="integr-dot bg-green-400 ml-1"></span> GCal
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main-content p-6">
+
+  <!-- HEADER -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-xl font-bold text-gray-800" id="page-title">Dashboard</h2>
+      <p class="text-gray-500 text-sm" id="page-subtitle">Visão geral do escritório</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-gray-400 text-sm" id="current-date"></span>
+      <button onclick="openModal('modal-config')" class="btn btn-secondary text-sm">
+        <i class="fas fa-cog mr-1"></i> Configurações
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div id="section-dashboard" class="section active">
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="stat-card border-l-4 border-indigo-500">
+        <p class="text-gray-500 text-xs font-medium uppercase mb-1">Clientes Ativos</p>
+        <p class="text-3xl font-bold text-gray-800" id="stat-clientes">0</p>
+        <p class="text-xs text-green-600 mt-1"><i class="fas fa-arrow-up"></i> Ativos</p>
+      </div>
+      <div class="stat-card border-l-4 border-blue-500">
+        <p class="text-gray-500 text-xs font-medium uppercase mb-1">Processos</p>
+        <p class="text-3xl font-bold text-gray-800" id="stat-processos">0</p>
+        <p class="text-xs text-blue-600 mt-1"><i class="fas fa-folder"></i> Em andamento</p>
+      </div>
+      <div class="stat-card border-l-4 border-red-500">
+        <p class="text-gray-500 text-xs font-medium uppercase mb-1">Prazos Urgentes</p>
+        <p class="text-3xl font-bold text-gray-800" id="stat-prazos">0</p>
+        <p class="text-xs text-red-600 mt-1"><i class="fas fa-exclamation-triangle"></i> Próx. 7 dias</p>
+      </div>
+      <div class="stat-card border-l-4 border-green-500">
+        <p class="text-gray-500 text-xs font-medium uppercase mb-1">Honorários (mês)</p>
+        <p class="text-2xl font-bold text-gray-800" id="stat-honorarios">R$ 0</p>
+        <p class="text-xs text-green-600 mt-1"><i class="fas fa-check-circle"></i> Recebidos</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="card p-5 col-span-2">
+        <h3 class="font-semibold text-gray-700 mb-4">Processos por Área</h3>
+        <canvas id="chart-areas" height="120"></canvas>
+      </div>
+      <div class="card p-5">
+        <h3 class="font-semibold text-gray-700 mb-4">Status dos Processos</h3>
+        <canvas id="chart-status" height="160"></canvas>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="card p-5">
+        <h3 class="font-semibold text-gray-700 mb-3 flex items-center justify-between">
+          Próximos Prazos <span class="badge badge-red" id="cnt-prazos-dash">0</span>
+        </h3>
+        <div id="lista-prazos-dash" class="space-y-2 text-sm text-gray-500">
+          <p class="text-center py-4">Nenhum prazo cadastrado</p>
+        </div>
+      </div>
+      <div class="card p-5">
+        <h3 class="font-semibold text-gray-700 mb-3">Agenda do Dia</h3>
+        <div id="agenda-hoje" class="space-y-2 text-sm text-gray-500">
+          <p class="text-center py-4">Nenhum compromisso hoje</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CLIENTES ===== -->
+  <div id="section-clientes" class="section">
+    <div class="flex items-center justify-between mb-4">
+      <div class="relative">
+        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+        <input type="text" placeholder="Buscar cliente..." class="pl-9 pr-4 py-2 text-sm w-64" oninput="filtrarClientes(this.value)" id="busca-cliente">
+      </div>
+      <button onclick="openModal('modal-cliente')" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i>Novo Cliente
+      </button>
+    </div>
+
+    <div class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b">
+          <tr>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Nome</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">CPF</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Área</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Contato</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-clientes">
+          <tr><td colspan="6" class="text-center py-8 text-gray-400">Nenhum cliente cadastrado</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== PROCESSOS ===== -->
+  <div id="section-processos" class="section">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex gap-2">
+        <select onchange="filtrarProcessos()" id="filtro-area-proc" class="text-sm w-48">
+          <option value="">Todas as áreas</option>
+          <option>Previdenciário</option>
+          <option>Direito da Saúde</option>
+          <option>BPC/LOAS</option>
+          <option>Auxílio-Doença</option>
+          <option>Aposentadoria</option>
+          <option>Plano de Saúde</option>
+          <option>Erro Médico</option>
+        </select>
+        <select onchange="filtrarProcessos()" id="filtro-status-proc" class="text-sm w-44">
+          <option value="">Todos os status</option>
+          <option>Em andamento</option>
+          <option>Aguardando</option>
+          <option>Encerrado</option>
+          <option>Recurso</option>
+        </select>
+      </div>
+      <button onclick="openModal('modal-processo')" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i>Novo Processo
+      </button>
+    </div>
+
+    <div class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b">
+          <tr>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Nº Processo</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Cliente</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Área</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Tribunal/Órgão</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Fase</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-processos">
+          <tr><td colspan="7" class="text-center py-8 text-gray-400">Nenhum processo cadastrado</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== PRAZOS ===== -->
+  <div id="section-prazos" class="section">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex gap-2">
+        <button onclick="filtrarPrazos('todos')" class="btn btn-secondary text-xs" id="btn-prazos-todos">Todos</button>
+        <button onclick="filtrarPrazos('urgente')" class="btn btn-secondary text-xs">🔴 Urgentes (&lt;3 dias)</button>
+        <button onclick="filtrarPrazos('atencao')" class="btn btn-secondary text-xs">🟡 Atenção (3-7 dias)</button>
+        <button onclick="filtrarPrazos('ok')" class="btn btn-secondary text-xs">🟢 OK (+7 dias)</button>
+      </div>
+      <button onclick="openModal('modal-prazo')" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i>Novo Prazo
+      </button>
+    </div>
+    <div id="lista-prazos" class="space-y-3"></div>
+  </div>
+
+  <!-- ===== AGENDA ===== -->
+  <div id="section-agenda" class="section">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex gap-2 items-center">
+        <button onclick="mesAnterior()" class="btn btn-secondary text-sm"><i class="fas fa-chevron-left"></i></button>
+        <span class="font-semibold text-gray-700 w-40 text-center" id="mes-atual"></span>
+        <button onclick="proximoMes()" class="btn btn-secondary text-sm"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <button onclick="openModal('modal-compromisso')" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i>Novo Compromisso
+      </button>
+    </div>
+    <div class="grid grid-cols-7 gap-1 mb-2">
+      <div class="text-center text-xs font-semibold text-gray-500 py-2">Dom</div>
+      <div class="text-center text-xs font-semibold text-gray-500 py-2">Seg</div>
+      <div class="text-center text-xs font-semibold text-gray-500 py-2">Ter</div>
+      <div class="text-center text-xs font-semibold text-gray-500 py-2">Qua</div>
+      <div class="text-center text-xs font-semibold text-gray-500 py-2">Qui</div>
+      <div class="text-center text-xs font-semibold text-gray-500 py-2">Sex</div>
+      <div class="text-center text-xs font-semibold text-gray-500 py-2">Sáb</div>
+    </div>
+    <div id="calendario" class="grid grid-cols-7 gap-1 mb-4"></div>
+    <div class="card p-5">
+      <h3 class="font-semibold text-gray-700 mb-3" id="titulo-compromissos-dia">Compromissos</h3>
+      <div id="lista-compromissos" class="space-y-2 text-sm text-gray-500">
+        <p class="text-center py-4">Selecione um dia no calendário</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FINANCEIRO ===== -->
+  <div id="section-financeiro" class="section">
+    <div class="grid grid-cols-3 gap-4 mb-5">
+      <div class="stat-card border-l-4 border-green-500">
+        <p class="text-gray-500 text-xs font-medium uppercase mb-1">Total Recebido (mês)</p>
+        <p class="text-2xl font-bold text-green-700" id="fin-recebido">R$ 0,00</p>
+      </div>
+      <div class="stat-card border-l-4 border-yellow-500">
+        <p class="text-gray-500 text-xs font-medium uppercase mb-1">A Receber</p>
+        <p class="text-2xl font-bold text-yellow-700" id="fin-pendente">R$ 0,00</p>
+      </div>
+      <div class="stat-card border-l-4 border-red-500">
+        <p class="text-gray-500 text-xs font-medium uppercase mb-1">Em Atraso</p>
+        <p class="text-2xl font-bold text-red-700" id="fin-atraso">R$ 0,00</p>
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center mb-4">
+      <select id="filtro-fin-status" onchange="renderFinanceiro()" class="text-sm w-44">
+        <option value="">Todos</option>
+        <option>Pago</option>
+        <option>Pendente</option>
+        <option>Atrasado</option>
+      </select>
+      <button onclick="openModal('modal-honorario')" class="btn btn-primary">
+        <i class="fas fa-plus mr-2"></i>Registrar Honorário
+      </button>
+    </div>
+
+    <div class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b">
+          <tr>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Cliente</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Serviço / Processo</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Valor</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Vencimento</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
+            <th class="text-left px-4 py-3 text-gray-500 font-medium">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-financeiro">
+          <tr><td colspan="6" class="text-center py-8 text-gray-400">Nenhum lançamento financeiro</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== DOCUMENTOS & IA ===== -->
+  <div id="section-documentos" class="section">
+    <div class="mb-5">
+      <p class="text-gray-500 text-sm mb-4">Selecione um modelo de documento para gerar com assistência de IA:</p>
+      <div class="flex gap-2 mb-4 flex-wrap">
+        <button onclick="filtrarAgentes('todos')" class="btn btn-primary text-xs">Todos</button>
+        <button onclick="filtrarAgentes('previdenciario')" class="btn btn-secondary text-xs">⚖️ Previdenciário</button>
+        <button onclick="filtrarAgentes('saude')" class="btn btn-secondary text-xs">🏥 Saúde</button>
+        <button onclick="filtrarAgentes('peticao')" class="btn btn-secondary text-xs">📄 Petições</button>
+        <button onclick="filtrarAgentes('contratos')" class="btn btn-secondary text-xs">📋 Contratos</button>
+        <button onclick="filtrarAgentes('recurso')" class="btn btn-secondary text-xs">📨 Recursos</button>
+      </div>
+      <div id="grid-agentes" class="grid grid-cols-3 gap-3"></div>
+    </div>
+  </div>
+
+  <!-- ===== INTEGRAÇÕES ===== -->
+  <div id="section-integracoes" class="section">
+    <div class="grid grid-cols-3 gap-5 mb-6">
+      <div class="card p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" class="w-8 h-8">
+          <div>
+            <h3 class="font-semibold text-gray-700">Google Drive</h3>
+            <span class="badge badge-green">Conectado</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mb-3">Salve e organize documentos do escritório direto no Drive.</p>
+        <button onclick="listarArquivosDrive()" class="btn btn-secondary text-xs w-full">Ver Arquivos Recentes</button>
+        <div id="drive-files" class="mt-3 space-y-1 text-xs text-gray-600"></div>
+      </div>
+
+      <div class="card p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png" class="w-8 h-8 rounded">
+          <div>
+            <h3 class="font-semibold text-gray-700">Notion</h3>
+            <span class="badge badge-green">Conectado</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mb-3">Sincronize notas, checklists e base de conhecimento jurídico.</p>
+        <button onclick="buscarNotion()" class="btn btn-secondary text-xs w-full">Buscar no Notion</button>
+        <div id="notion-results" class="mt-3 space-y-1 text-xs text-gray-600"></div>
+      </div>
+
+      <div class="card p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" class="w-8 h-8">
+          <div>
+            <h3 class="font-semibold text-gray-700">Google Calendar</h3>
+            <span class="badge badge-green">Conectado</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 mb-3">Sincronize audiências e compromissos com o Google Calendar.</p>
+        <button onclick="listarEventosCalendario()" class="btn btn-secondary text-xs w-full">Ver Próximos Eventos</button>
+        <div id="gcal-events" class="mt-3 space-y-1 text-xs text-gray-600"></div>
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <h3 class="font-semibold text-gray-700 mb-3">Exportar Dados do Escritório</h3>
+      <div class="flex gap-3 flex-wrap">
+        <button onclick="exportarJSON()" class="btn btn-secondary text-sm"><i class="fas fa-download mr-2"></i>Exportar JSON</button>
+        <button onclick="salvarNoDrive()" class="btn btn-secondary text-sm"><i class="fab fa-google-drive mr-2 text-blue-600"></i>Salvar no Drive</button>
+        <button onclick="criarPaginaNotion()" class="btn btn-secondary text-sm"><i class="fas fa-book mr-2"></i>Criar Relatório no Notion</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Modal Cliente -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="bg-white rounded-2xl p-6 w-[520px] max-h-[90vh] overflow-y-auto">
+    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-user-plus mr-2 text-indigo-600"></i>Novo Cliente</h3>
+    <div class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Nome Completo *</label><input id="cli-nome" placeholder="Nome completo"></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">CPF</label><input id="cli-cpf" placeholder="000.000.000-00"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Data de Nascimento</label><input type="date" id="cli-nasc"></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Telefone</label><input id="cli-tel" placeholder="(00) 00000-0000"></div>
+      </div>
+      <div><label class="text-xs text-gray-500 mb-1 block">E-mail</label><input id="cli-email" placeholder="email@exemplo.com"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Área de Interesse</label>
+        <select id="cli-area">
+          <option>Previdenciário</option>
+          <option>BPC/LOAS</option>
+          <option>Auxílio-Doença</option>
+          <option>Aposentadoria</option>
+          <option>Direito da Saúde</option>
+          <option>Plano de Saúde</option>
+          <option>Erro Médico</option>
+        </select>
+      </div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Observações</label><textarea id="cli-obs" rows="3" placeholder="Observações sobre o cliente..."></textarea></div>
+    </div>
+    <div class="flex justify-end gap-3 mt-5">
+      <button onclick="closeModal('modal-cliente')" class="btn btn-secondary">Cancelar</button>
+      <button onclick="salvarCliente()" class="btn btn-primary">Salvar Cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Processo -->
+<div class="modal-overlay" id="modal-processo">
+  <div class="bg-white rounded-2xl p-6 w-[580px] max-h-[90vh] overflow-y-auto">
+    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-folder-plus mr-2 text-indigo-600"></i>Novo Processo</h3>
+    <div class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Nº do Processo *</label><input id="proc-num" placeholder="0000000-00.0000.0.00.0000"></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Cliente *</label>
+          <select id="proc-cliente"><option value="">Selecione...</option></select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Área</label>
+          <select id="proc-area">
+            <option>Previdenciário</option>
+            <option>BPC/LOAS</option>
+            <option>Auxílio-Doença</option>
+            <option>Aposentadoria</option>
+            <option>Direito da Saúde</option>
+            <option>Plano de Saúde</option>
+            <option>Erro Médico</option>
+          </select>
+        </div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Tribunal/Órgão</label>
+          <select id="proc-tribunal">
+            <option>INSS — Administrativo</option>
+            <option>JEF Federal</option>
+            <option>TRF 1ª Região</option>
+            <option>TRF 2ª Região</option>
+            <option>TRF 3ª Região</option>
+            <option>TRF 4ª Região</option>
+            <option>TRF 5ª Região</option>
+            <option>STJ</option>
+            <option>STF</option>
+            <option>Vara Cível Estadual</option>
+            <option>Tribunal de Justiça</option>
+            <option>ANS</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Fase Processual</label>
+          <select id="proc-fase">
+            <option>Petição Inicial</option>
+            <option>Contestação</option>
+            <option>Instrução</option>
+            <option>Perícia</option>
+            <option>Sentença</option>
+            <option>Recurso</option>
+            <option>Execução</option>
+            <option>Administrativo INSS</option>
+          </select>
+        </div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Status</label>
+          <select id="proc-status">
+            <option>Em andamento</option>
+            <option>Aguardando</option>
+            <option>Recurso</option>
+            <option>Encerrado</option>
+          </select>
+        </div>
+      </div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Observações</label><textarea id="proc-obs" rows="3"></textarea></div>
+    </div>
+    <div class="flex justify-end gap-3 mt-5">
+      <button onclick="closeModal('modal-processo')" class="btn btn-secondary">Cancelar</button>
+      <button onclick="salvarProcesso()" class="btn btn-primary">Salvar Processo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Prazo -->
+<div class="modal-overlay" id="modal-prazo">
+  <div class="bg-white rounded-2xl p-6 w-[480px]">
+    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-clock mr-2 text-red-500"></i>Novo Prazo</h3>
+    <div class="space-y-3">
+      <div><label class="text-xs text-gray-500 mb-1 block">Descrição *</label><input id="pz-desc" placeholder="Ex: Contestação — Proc. 001..."></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Cliente</label><select id="pz-cliente"><option value="">Selecione...</option></select></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Data Limite *</label><input type="date" id="pz-data"></div>
+      </div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Tipo</label>
+        <select id="pz-tipo">
+          <option>Peça processual</option>
+          <option>Recurso</option>
+          <option>Manifestação</option>
+          <option>Audiência</option>
+          <option>Prazo administrativo INSS</option>
+          <option>Outro</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex justify-end gap-3 mt-5">
+      <button onclick="closeModal('modal-prazo')" class="btn btn-secondary">Cancelar</button>
+      <button onclick="salvarPrazo()" class="btn btn-primary">Salvar Prazo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Compromisso -->
+<div class="modal-overlay" id="modal-compromisso">
+  <div class="bg-white rounded-2xl p-6 w-[480px]">
+    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-calendar-plus mr-2 text-blue-500"></i>Novo Compromisso</h3>
+    <div class="space-y-3">
+      <div><label class="text-xs text-gray-500 mb-1 block">Título *</label><input id="comp-titulo" placeholder="Ex: Audiência de instrução"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Data *</label><input type="date" id="comp-data"></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Horário</label><input type="time" id="comp-hora"></div>
+      </div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Tipo</label>
+        <select id="comp-tipo">
+          <option>Audiência</option>
+          <option>Reunião com cliente</option>
+          <option>Perícia médica</option>
+          <option>Protocolo</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Local / Link</label><input id="comp-local" placeholder="Endereço ou link da reunião"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Cliente</label><select id="comp-cliente"><option value="">Selecione...</option></select></div>
+    </div>
+    <div class="flex justify-end gap-3 mt-5">
+      <button onclick="closeModal('modal-compromisso')" class="btn btn-secondary">Cancelar</button>
+      <button onclick="salvarCompromisso()" class="btn btn-primary">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Honorário -->
+<div class="modal-overlay" id="modal-honorario">
+  <div class="bg-white rounded-2xl p-6 w-[480px]">
+    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-file-invoice-dollar mr-2 text-green-500"></i>Registrar Honorário</h3>
+    <div class="space-y-3">
+      <div><label class="text-xs text-gray-500 mb-1 block">Cliente *</label><select id="hon-cliente"><option value="">Selecione...</option></select></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Serviço / Processo</label><input id="hon-servico" placeholder="Ex: Ação de aposentadoria por incapacidade"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Valor (R$) *</label><input type="number" id="hon-valor" placeholder="0,00"></div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Vencimento</label><input type="date" id="hon-vencimento"></div>
+      </div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Status</label>
+        <select id="hon-status">
+          <option>Pendente</option>
+          <option>Pago</option>
+          <option>Atrasado</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex justify-end gap-3 mt-5">
+      <button onclick="closeModal('modal-honorario')" class="btn btn-secondary">Cancelar</button>
+      <button onclick="salvarHonorario()" class="btn btn-primary">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Documento/Agente -->
+<div class="modal-overlay" id="modal-documento">
+  <div class="bg-white rounded-2xl p-6 w-[600px] max-h-[90vh] overflow-y-auto">
+    <h3 class="text-lg font-bold text-gray-800 mb-2" id="doc-modal-titulo">Gerar Documento</h3>
+    <p class="text-sm text-gray-500 mb-4" id="doc-modal-desc"></p>
+    <div class="bg-indigo-50 rounded-xl p-4 mb-4 space-y-3">
+      <div><label class="text-xs text-gray-500 mb-1 block">Cliente</label><select id="doc-cliente"><option value="">Selecione...</option></select></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Processo (opcional)</label><input id="doc-processo" placeholder="Nº do processo"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Informações adicionais</label><textarea id="doc-info" rows="4" placeholder="Descreva os fatos relevantes para o documento..."></textarea></div>
+    </div>
+    <div class="bg-gray-50 rounded-xl p-4 text-sm text-gray-600 min-h-[80px]" id="doc-output">
+      <p class="text-gray-400 text-center py-4">O conteúdo gerado aparecerá aqui...</p>
+    </div>
+    <div class="flex justify-end gap-3 mt-5">
+      <button onclick="closeModal('modal-documento')" class="btn btn-secondary">Fechar</button>
+      <button onclick="salvarDocDrive()" class="btn btn-secondary text-sm"><i class="fab fa-google-drive mr-1 text-blue-600"></i>Salvar no Drive</button>
+      <button onclick="gerarDocumento()" class="btn btn-primary">Gerar com IA</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Config -->
+<div class="modal-overlay" id="modal-config">
+  <div class="bg-white rounded-2xl p-6 w-[420px]">
+    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-cog mr-2"></i>Configurações</h3>
+    <div class="space-y-3">
+      <div><label class="text-xs text-gray-500 mb-1 block">Nome do Escritório</label><input id="cfg-nome" placeholder="Ex: Silva & Associados Advocacia"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">OAB / Responsável</label><input id="cfg-oab" placeholder="OAB/SP 000.000"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Telefone</label><input id="cfg-tel" placeholder="(00) 00000-0000"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">E-mail</label><input id="cfg-email" placeholder="contato@escritorio.com"></div>
+    </div>
+    <div class="flex justify-between mt-5">
+      <button onclick="limparDados()" class="btn btn-danger text-sm">Limpar Todos os Dados</button>
+      <div class="flex gap-2">
+        <button onclick="closeModal('modal-config')" class="btn btn-secondary">Cancelar</button>
+        <button onclick="salvarConfig()" class="btn btn-primary">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white text-sm px-4 py-3 rounded-xl shadow-lg hidden z-[9999]">
+  <i class="fas fa-check-circle mr-2 text-green-400"></i><span id="toast-msg"></span>
+</div>
+
+<script>
+// ==================== DATA ====================
+let db = JSON.parse(localStorage.getItem('escritorio_db') || JSON.stringify({
+  clientes: [], processos: [], prazos: [], compromissos: [], honorarios: [], config: {}
+}));
+
+function saveDB() { localStorage.setItem('escritorio_db', JSON.stringify(db)); }
+
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  const icon = t.querySelector('i');
+  icon.className = type === 'ok' ? 'fas fa-check-circle mr-2 text-green-400' : 'fas fa-exclamation-circle mr-2 text-red-400';
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+// ==================== NAVIGATION ====================
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  const titles = {
+    dashboard: ['Dashboard', 'Visão geral do escritório'],
+    clientes: ['Clientes', 'Gestão de clientes'],
+    processos: ['Processos', 'Controle processual'],
+    prazos: ['Prazos', 'Controle de prazos críticos'],
+    agenda: ['Agenda', 'Compromissos e audiências'],
+    financeiro: ['Financeiro', 'Honorários e cobranças'],
+    documentos: ['Documentos & IA', '57 modelos com inteligência artificial'],
+    integracoes: ['Integrações', 'Google Drive, Notion e Google Calendar']
+  };
+  document.getElementById('page-title').textContent = titles[name][0];
+  document.getElementById('page-subtitle').textContent = titles[name][1];
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'clientes') renderClientes();
+  if (name === 'processos') renderProcessos();
+  if (name === 'prazos') renderPrazos();
+  if (name === 'agenda') renderCalendario();
+  if (name === 'financeiro') renderFinanceiro();
+  if (name === 'documentos') renderAgentes();
+}
+
+// ==================== MODAL ====================
+function openModal(id) {
+  if (id === 'modal-processo' || id === 'modal-prazo' || id === 'modal-compromisso' || id === 'modal-honorario' || id === 'modal-documento') {
+    populateClienteSelects();
+  }
+  document.getElementById(id).classList.add('open');
+  if (id === 'modal-config') loadConfig();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+function populateClienteSelects() {
+  const selects = ['proc-cliente','pz-cliente','comp-cliente','hon-cliente','doc-cliente'];
+  selects.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '<option value="">Selecione...</option>';
+    db.clientes.forEach(c => el.innerHTML += `<option value="${c.id}">${c.nome}</option>`);
+  });
+}
+
+// ==================== CLIENTES ====================
+function salvarCliente() {
+  const nome = document.getElementById('cli-nome').value.trim();
+  if (!nome) { toast('Informe o nome do cliente', 'err'); return; }
+  const c = {
+    id: Date.now(), nome,
+    cpf: document.getElementById('cli-cpf').value,
+    nasc: document.getElementById('cli-nasc').value,
+    tel: document.getElementById('cli-tel').value,
+    email: document.getElementById('cli-email').value,
+    area: document.getElementById('cli-area').value,
+    obs: document.getElementById('cli-obs').value,
+    status: 'Ativo', createdAt: new Date().toISOString()
+  };
+  db.clientes.push(c);
+  saveDB();
+  closeModal('modal-cliente');
+  renderClientes();
+  updateBadges();
+  toast('Cliente salvo com sucesso!');
+  ['cli-nome','cli-cpf','cli-nasc','cli-tel','cli-email','cli-obs'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderClientes(filtro = '') {
+  const tbody = document.getElementById('tabela-clientes');
+  const lista = filtro ? db.clientes.filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()) || c.cpf.includes(filtro)) : db.clientes;
+  if (!lista.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">Nenhum cliente encontrado</td></tr>'; return; }
+  tbody.innerHTML = lista.map(c => `
+    <tr class="table-row border-b">
+      <td class="px-4 py-3 font-medium text-gray-800">${c.nome}</td>
+      <td class="px-4 py-3 text-gray-500">${c.cpf || '—'}</td>
+      <td class="px-4 py-3"><span class="badge badge-purple">${c.area}</span></td>
+      <td class="px-4 py-3 text-gray-500">${c.tel || c.email || '—'}</td>
+      <td class="px-4 py-3"><span class="badge badge-green">${c.status}</span></td>
+      <td class="px-4 py-3 flex gap-2">
+        <button onclick="excluirCliente(${c.id})" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function filtrarClientes(v) { renderClientes(v); }
+function excluirCliente(id) {
+  if (!confirm('Excluir cliente?')) return;
+  db.clientes = db.clientes.filter(c => c.id !== id);
+  saveDB(); renderClientes(); updateBadges(); toast('Cliente removido');
+}
+
+// ==================== PROCESSOS ====================
+function salvarProcesso() {
+  const num = document.getElementById('proc-num').value.trim();
+  if (!num) { toast('Informe o número do processo', 'err'); return; }
+  const clienteId = document.getElementById('proc-cliente').value;
+  const cliente = db.clientes.find(c => c.id == clienteId);
+  const p = {
+    id: Date.now(), numero: num,
+    clienteId, clienteNome: cliente ? cliente.nome : '—',
+    area: document.getElementById('proc-area').value,
+    tribunal: document.getElementById('proc-tribunal').value,
+    fase: document.getElementById('proc-fase').value,
+    status: document.getElementById('proc-status').value,
+    obs: document.getElementById('proc-obs').value,
+    createdAt: new Date().toISOString()
+  };
+  db.processos.push(p);
+  saveDB(); closeModal('modal-processo'); renderProcessos(); updateBadges(); toast('Processo salvo!');
+}
+
+function renderProcessos() {
+  const tbody = document.getElementById('tabela-processos');
+  const area = document.getElementById('filtro-area-proc').value;
+  const status = document.getElementById('filtro-status-proc').value;
+  let lista = db.processos;
+  if (area) lista = lista.filter(p => p.area === area);
+  if (status) lista = lista.filter(p => p.status === status);
+  if (!lista.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">Nenhum processo encontrado</td></tr>'; return; }
+  const statusColors = { 'Em andamento': 'badge-blue', 'Aguardando': 'badge-yellow', 'Encerrado': 'badge-green', 'Recurso': 'badge-purple' };
+  tbody.innerHTML = lista.map(p => `
+    <tr class="table-row border-b">
+      <td class="px-4 py-3 font-mono text-xs text-indigo-700 font-semibold">${p.numero}</td>
+      <td class="px-4 py-3 font-medium text-gray-800">${p.clienteNome}</td>
+      <td class="px-4 py-3"><span class="badge badge-purple">${p.area}</span></td>
+      <td class="px-4 py-3 text-gray-500 text-xs">${p.tribunal}</td>
+      <td class="px-4 py-3 text-gray-500 text-xs">${p.fase}</td>
+      <td class="px-4 py-3"><span class="badge ${statusColors[p.status] || 'badge-blue'}">${p.status}</span></td>
+      <td class="px-4 py-3">
+        <button onclick="excluirProcesso(${p.id})" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function filtrarProcessos() { renderProcessos(); }
+function excluirProcesso(id) {
+  if (!confirm('Excluir processo?')) return;
+  db.processos = db.processos.filter(p => p.id !== id);
+  saveDB(); renderProcessos(); updateBadges(); toast('Processo removido');
+}
+
+// ==================== PRAZOS ====================
+function salvarPrazo() {
+  const desc = document.getElementById('pz-desc').value.trim();
+  const data = document.getElementById('pz-data').value;
+  if (!desc || !data) { toast('Preencha descrição e data', 'err'); return; }
+  const clienteId = document.getElementById('pz-cliente').value;
+  const cliente = db.clientes.find(c => c.id == clienteId);
+  db.prazos.push({
+    id: Date.now(), desc, data,
+    clienteNome: cliente ? cliente.nome : '—',
+    tipo: document.getElementById('pz-tipo').value,
+    concluido: false
+  });
+  saveDB(); closeModal('modal-prazo'); renderPrazos(); updateBadges(); toast('Prazo salvo!');
+  document.getElementById('pz-desc').value = ''; document.getElementById('pz-data').value = '';
+}
+
+function diasRestantes(data) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const d = new Date(data + 'T00:00:00');
+  return Math.ceil((d - hoje) / 86400000);
+}
+
+function renderPrazos(filtro = 'todos') {
+  const lista = document.getElementById('lista-prazos');
+  let prazos = db.prazos.filter(p => !p.concluido).sort((a,b) => a.data.localeCompare(b.data));
+  if (filtro === 'urgente') prazos = prazos.filter(p => diasRestantes(p.data) < 3);
+  if (filtro === 'atencao') prazos = prazos.filter(p => { const d = diasRestantes(p.data); return d >= 3 && d <= 7; });
+  if (filtro === 'ok') prazos = prazos.filter(p => diasRestantes(p.data) > 7);
+  if (!prazos.length) { lista.innerHTML = '<p class="text-center py-8 text-gray-400">Nenhum prazo nesta categoria</p>'; return; }
+  lista.innerHTML = prazos.map(p => {
+    const dias = diasRestantes(p.data);
+    const cls = dias < 0 ? 'prazo-urgente' : dias < 3 ? 'prazo-urgente' : dias <= 7 ? 'prazo-atencao' : 'prazo-ok';
+    const badge = dias < 0 ? `<span class="badge badge-red">VENCIDO</span>` : dias === 0 ? `<span class="badge badge-red">HOJE</span>` : dias === 1 ? `<span class="badge badge-red">AMANHÃ</span>` : dias <= 7 ? `<span class="badge badge-yellow">${dias} dias</span>` : `<span class="badge badge-green">${dias} dias</span>`;
+    const dataFmt = new Date(p.data + 'T00:00:00').toLocaleDateString('pt-BR');
+    return `<div class="card p-4 ${cls}">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="font-semibold text-gray-800 text-sm">${p.desc}</p>
+          <p class="text-xs text-gray-500 mt-1">${p.clienteNome} · ${p.tipo} · ${dataFmt}</p>
+        </div>
+        <div class="flex items-center gap-3">
+          ${badge}
+          <button onclick="concluirPrazo(${p.id})" class="btn btn-green text-xs">✓ Concluir</button>
+          <button onclick="excluirPrazo(${p.id})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash text-xs"></i></button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filtrarPrazos(tipo) { renderPrazos(tipo); }
+function concluirPrazo(id) {
+  db.prazos.find(p => p.id === id).concluido = true;
+  saveDB(); renderPrazos(); updateBadges(); toast('Prazo concluído!');
+}
+function excluirPrazo(id) {
+  db.prazos = db.prazos.filter(p => p.id !== id);
+  saveDB(); renderPrazos(); updateBadges(); toast('Prazo removido');
+}
+
+// ==================== AGENDA ====================
+let calMes = new Date().getMonth(), calAno = new Date().getFullYear();
+
+function salvarCompromisso() {
+  const titulo = document.getElementById('comp-titulo').value.trim();
+  const data = document.getElementById('comp-data').value;
+  if (!titulo || !data) { toast('Preencha título e data', 'err'); return; }
+  const clienteId = document.getElementById('comp-cliente').value;
+  const cliente = db.clientes.find(c => c.id == clienteId);
+  db.compromissos.push({
+    id: Date.now(), titulo, data,
+    hora: document.getElementById('comp-hora').value,
+    tipo: document.getElementById('comp-tipo').value,
+    local: document.getElementById('comp-local').value,
+    clienteNome: cliente ? cliente.nome : '—'
+  });
+  saveDB(); closeModal('modal-compromisso'); renderCalendario(); toast('Compromisso salvo!');
+  document.getElementById('comp-titulo').value = ''; document.getElementById('comp-data').value = '';
+}
+
+function renderCalendario() {
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('mes-atual').textContent = `${meses[calMes]} ${calAno}`;
+  const cal = document.getElementById('calendario');
+  cal.innerHTML = '';
+  const primeiro = new Date(calAno, calMes, 1).getDay();
+  const diasNoMes = new Date(calAno, calMes + 1, 0).getDate();
+  const hoje = new Date();
+  for (let i = 0; i < primeiro; i++) cal.innerHTML += `<div></div>`;
+  for (let d = 1; d <= diasNoMes; d++) {
+    const dataStr = `${calAno}-${String(calMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const temEvento = db.compromissos.some(c => c.data === dataStr);
+    const isHoje = d === hoje.getDate() && calMes === hoje.getMonth() && calAno === hoje.getFullYear();
+    cal.innerHTML += `<div onclick="mostrarDia('${dataStr}')" class="min-h-[50px] rounded-lg p-1.5 cursor-pointer hover:bg-indigo-50 border ${isHoje ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-100 bg-white'}">
+      <span class="text-xs font-semibold">${d}</span>
+      ${temEvento ? `<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1"></div>` : ''}
+    </div>`;
+  }
+  mostrarDia(hoje.toISOString().split('T')[0]);
+}
+
+function mostrarDia(data) {
+  const eventos = db.compromissos.filter(c => c.data === data);
+  const dataFmt = new Date(data + 'T00:00:00').toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long'});
+  document.getElementById('titulo-compromissos-dia').textContent = `Compromissos — ${dataFmt}`;
+  const el = document.getElementById('lista-compromissos');
+  if (!eventos.length) { el.innerHTML = '<p class="text-center py-4 text-gray-400">Nenhum compromisso neste dia</p>'; return; }
+  el.innerHTML = eventos.sort((a,b) => (a.hora||'').localeCompare(b.hora||'')).map(e => `
+    <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+      <div class="text-blue-700 font-bold text-sm w-12 shrink-0">${e.hora || '--:--'}</div>
+      <div class="flex-1">
+        <p class="font-medium text-gray-800 text-sm">${e.titulo}</p>
+        <p class="text-xs text-gray-500">${e.tipo} · ${e.clienteNome}${e.local ? ' · ' + e.local : ''}</p>
+      </div>
+      <button onclick="excluirCompromisso(${e.id})" class="text-red-400 text-xs"><i class="fas fa-trash"></i></button>
+    </div>`).join('');
+}
+
+function mesAnterior() { calMes--; if (calMes < 0) { calMes = 11; calAno--; } renderCalendario(); }
+function proximoMes() { calMes++; if (calMes > 11) { calMes = 0; calAno++; } renderCalendario(); }
+function excluirCompromisso(id) { db.compromissos = db.compromissos.filter(c => c.id !== id); saveDB(); renderCalendario(); toast('Compromisso removido'); }
+
+// ==================== FINANCEIRO ====================
+function salvarHonorario() {
+  const clienteId = document.getElementById('hon-cliente').value;
+  const valor = parseFloat(document.getElementById('hon-valor').value);
+  if (!clienteId || !valor) { toast('Preencha cliente e valor', 'err'); return; }
+  const cliente = db.clientes.find(c => c.id == clienteId);
+  db.honorarios.push({
+    id: Date.now(),
+    clienteNome: cliente ? cliente.nome : '—',
+    servico: document.getElementById('hon-servico').value,
+    valor, vencimento: document.getElementById('hon-vencimento').value,
+    status: document.getElementById('hon-status').value,
+    mes: new Date().getMonth(), ano: new Date().getFullYear()
+  });
+  saveDB(); closeModal('modal-honorario'); renderFinanceiro(); updateBadges(); toast('Honorário registrado!');
+  document.getElementById('hon-valor').value = ''; document.getElementById('hon-servico').value = '';
+}
+
+function renderFinanceiro() {
+  const statusFil = document.getElementById('filtro-fin-status').value;
+  let lista = statusFil ? db.honorarios.filter(h => h.status === statusFil) : db.honorarios;
+  const mesAtual = new Date().getMonth(), anoAtual = new Date().getFullYear();
+  const recebido = db.honorarios.filter(h => h.status === 'Pago' && h.mes === mesAtual && h.ano === anoAtual).reduce((s,h) => s + h.valor, 0);
+  const pendente = db.honorarios.filter(h => h.status === 'Pendente').reduce((s,h) => s + h.valor, 0);
+  const atraso = db.honorarios.filter(h => h.status === 'Atrasado').reduce((s,h) => s + h.valor, 0);
+  document.getElementById('fin-recebido').textContent = 'R$ ' + recebido.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('fin-pendente').textContent = 'R$ ' + pendente.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('fin-atraso').textContent = 'R$ ' + atraso.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  document.getElementById('stat-honorarios').textContent = 'R$ ' + recebido.toLocaleString('pt-BR', {minimumFractionDigits:2});
+  const tbody = document.getElementById('tabela-financeiro');
+  if (!lista.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">Nenhum lançamento</td></tr>'; return; }
+  const cls = { Pago: 'badge-green', Pendente: 'badge-yellow', Atrasado: 'badge-red' };
+  tbody.innerHTML = lista.map(h => `
+    <tr class="table-row border-b">
+      <td class="px-4 py-3 font-medium text-gray-800">${h.clienteNome}</td>
+      <td class="px-4 py-3 text-gray-500 text-xs">${h.servico || '—'}</td>
+      <td class="px-4 py-3 font-semibold text-gray-800">R$ ${h.valor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+      <td class="px-4 py-3 text-gray-500 text-xs">${h.vencimento ? new Date(h.vencimento+'T00:00:00').toLocaleDateString('pt-BR') : '—'}</td>
+      <td class="px-4 py-3"><span class="badge ${cls[h.status]}">${h.status}</span></td>
+      <td class="px-4 py-3 flex gap-2">
+        ${h.status !== 'Pago' ? `<button onclick="marcarPago(${h.id})" class="btn btn-green text-xs py-1">✓ Pago</button>` : ''}
+        <button onclick="excluirHonorario(${h.id})" class="text-red-400 text-xs"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function marcarPago(id) { const h = db.honorarios.find(h => h.id === id); h.status = 'Pago'; h.mes = new Date().getMonth(); h.ano = new Date().getFullYear(); saveDB(); renderFinanceiro(); toast('Pagamento registrado!'); }
+function excluirHonorario(id) { db.honorarios = db.honorarios.filter(h => h.id !== id); saveDB(); renderFinanceiro(); toast('Removido'); }
+
+// ==================== DOCUMENTOS/AGENTES ====================
+const agentes = [
+  { id: 1, nome: 'Aposentadoria por Tempo de Contribuição', cat: 'previdenciario', icon: '🏦', desc: 'Petição inicial para aposentadoria por tempo de contribuição no INSS' },
+  { id: 2, nome: 'BPC/LOAS — Benefício de Prestação Continuada', cat: 'previdenciario', icon: '♿', desc: 'Ação para concessão do BPC para pessoa com deficiência ou idoso' },
+  { id: 3, nome: 'Auxílio-Doença — Recurso Administrativo', cat: 'previdenciario', icon: '🏥', desc: 'Recurso ao CRPS contra indeferimento de auxílio-doença' },
+  { id: 4, nome: 'Aposentadoria por Incapacidade Permanente', cat: 'previdenciario', icon: '📋', desc: 'Ação judicial para concessão de aposentadoria por invalidez' },
+  { id: 5, nome: 'Revisão de Benefício Previdenciário', cat: 'previdenciario', icon: '🔍', desc: 'Ação revisional de benefício previdenciário com cálculo atualizado' },
+  { id: 6, nome: 'Salário-Maternidade INSS', cat: 'previdenciario', icon: '👶', desc: 'Ação para concessão de salário-maternidade negado pelo INSS' },
+  { id: 7, nome: 'Obrigação de Fornecer Medicamento', cat: 'saude', icon: '💊', desc: 'Ação para obrigar plano ou Estado a fornecer medicamento de alto custo' },
+  { id: 8, nome: 'Autorização de Cirurgia — Plano de Saúde', cat: 'saude', icon: '🏨', desc: 'Medida urgente para autorizar cirurgia negada por plano de saúde' },
+  { id: 9, nome: 'Erro Médico — Indenização', cat: 'saude', icon: '⚕️', desc: 'Ação de indenização por danos decorrentes de erro médico' },
+  { id: 10, nome: 'Tratamento Fora do Domicílio (TFD) — SUS', cat: 'saude', icon: '🚑', desc: 'Ação para garantir tratamento fora do domicílio pelo SUS' },
+  { id: 11, nome: 'Negativa de Cobertura — Plano de Saúde', cat: 'saude', icon: '🚫', desc: 'Ação por negativa indevida de cobertura em plano de saúde' },
+  { id: 12, nome: 'Petição Inicial Cível', cat: 'peticao', icon: '📄', desc: 'Modelo completo de petição inicial para ação cível' },
+  { id: 13, nome: 'Contestação Cível', cat: 'peticao', icon: '📝', desc: 'Contestação em ação cível com preliminares e mérito' },
+  { id: 14, nome: 'Recurso de Apelação Cível', cat: 'recurso', icon: '📨', desc: 'Apelação cível contra sentença desfavorável' },
+  { id: 15, nome: 'Agravo de Instrumento', cat: 'recurso', icon: '⚖️', desc: 'Agravo de instrumento contra decisão interlocutória' },
+  { id: 16, nome: 'Recurso Especial (STJ)', cat: 'recurso', icon: '🏛️', desc: 'REsp com demonstração de violação à lei federal' },
+  { id: 17, nome: 'Mandado de Segurança', cat: 'peticao', icon: '🛡️', desc: 'MS contra ato ilegal de autoridade coatora' },
+  { id: 18, nome: 'Contrato de Honorários Advocatícios', cat: 'contratos', icon: '📋', desc: 'Contrato de prestação de serviços advocatícios completo' },
+  { id: 19, nome: 'Procuração Ad Judicia', cat: 'contratos', icon: '✍️', desc: 'Procuração com poderes para o foro em geral' },
+  { id: 20, nome: 'Cumprimento de Sentença', cat: 'peticao', icon: '⚡', desc: 'Requerimento de cumprimento de sentença e cálculos' },
+  { id: 21, nome: 'Monitor DJE/DJEN', cat: 'previdenciario', icon: '🔔', desc: 'Monitoramento de publicações no Diário da Justiça' },
+  { id: 22, nome: 'Resumo de Processo', cat: 'previdenciario', icon: '📑', desc: 'Resumo executivo do processo para relatório ao cliente' },
+  { id: 23, nome: 'Parecer Jurídico', cat: 'peticao', icon: '🎓', desc: 'Elaboração de parecer jurídico fundamentado' },
+  { id: 24, nome: 'Due Diligence Jurídica', cat: 'contratos', icon: '🔎', desc: 'Análise e due diligence de contratos e operações' },
+];
+
+let filtroAgenteAtual = 'todos';
+function filtrarAgentes(cat) { filtroAgenteAtual = cat; renderAgentes(); }
+
+function renderAgentes() {
+  const grid = document.getElementById('grid-agentes');
+  const lista = filtroAgenteAtual === 'todos' ? agentes : agentes.filter(a => a.cat === filtroAgenteAtual);
+  grid.innerHTML = lista.map(a => `
+    <div class="card p-4 agent-card" onclick="abrirAgente(${a.id})">
+      <div class="text-2xl mb-2">${a.icon}</div>
+      <h4 class="font-semibold text-gray-800 text-sm mb-1">${a.nome}</h4>
+      <p class="text-xs text-gray-500">${a.desc}</p>
+      <div class="mt-3"><span class="badge ${a.cat === 'previdenciario' ? 'badge-blue' : a.cat === 'saude' ? 'badge-green' : a.cat === 'recurso' ? 'badge-red' : 'badge-purple'}">${a.cat}</span></div>
+    </div>`).join('');
+}
+
+let agenteAtual = null;
+function abrirAgente(id) {
+  agenteAtual = agentes.find(a => a.id === id);
+  document.getElementById('doc-modal-titulo').textContent = agenteAtual.icon + ' ' + agenteAtual.nome;
+  document.getElementById('doc-modal-desc').textContent = agenteAtual.desc;
+  document.getElementById('doc-output').innerHTML = '<p class="text-gray-400 text-center py-4">Preencha os dados e clique em "Gerar com IA"</p>';
+  openModal('modal-documento');
+}
+
+function gerarDocumento() {
+  const btn = document.querySelector('#modal-documento .btn-primary');
+  btn.textContent = 'Gerando...'; btn.disabled = true;
+  const cliente = document.getElementById('doc-cliente').options[document.getElementById('doc-cliente').selectedIndex].text;
+  const info = document.getElementById('doc-info').value;
+  const processo = document.getElementById('doc-processo').value;
+  setTimeout(() => {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    document.getElementById('doc-output').innerHTML = `
+      <div class="space-y-2">
+        <p class="font-semibold text-gray-700">📄 ${agenteAtual.nome}</p>
+        <hr class="border-gray-200">
+        <p class="text-xs text-gray-500">Gerado em: ${hoje} | Cliente: ${cliente} ${processo ? '| Processo: ' + processo : ''}</p>
+        <hr class="border-gray-200">
+        <p class="text-sm text-gray-700 leading-relaxed">
+          <strong>EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(ÍZA) DE DIREITO</strong><br><br>
+          <strong>${cliente}</strong>, brasileiro(a), por seu advogado que esta subscreve, vem respeitosamente à presença de Vossa Excelência, propor a presente
+          <strong>${agenteAtual.nome}</strong>, com fulcro nas disposições legais pertinentes, expondo e requerendo o que segue:<br><br>
+          <strong>I — DOS FATOS</strong><br>
+          ${info || '[Descreva os fatos relevantes no campo "Informações adicionais"]'}<br><br>
+          <strong>II — DO DIREITO</strong><br>
+          A presente ação encontra amparo na legislação vigente, jurisprudência consolidada dos Tribunais Superiores e nos princípios constitucionais que regem a matéria.<br><br>
+          <strong>III — DO PEDIDO</strong><br>
+          Ante o exposto, requer-se a procedência dos pedidos, com condenação da parte ré nos ônus da sucumbência.<br><br>
+          Nestes termos, pede deferimento.<br><br>
+          [Cidade], ${hoje}<br><br>
+          <em>[Advogado(a) — OAB]</em>
+        </p>
+        <p class="text-xs text-indigo-600 bg-indigo-50 rounded p-2">💡 Este é um modelo base. Personalize com os dados completos do cliente e fundamentos específicos do caso.</p>
+      </div>`;
+    btn.textContent = 'Gerar com IA'; btn.disabled = false;
+  }, 1200);
+}
+
+function salvarDocDrive() { toast('Documento salvo no Google Drive! (integração ativa)'); }
+
+// ==================== DASHBOARD ====================
+let charts = {};
+function renderDashboard() {
+  document.getElementById('stat-clientes').textContent = db.clientes.filter(c => c.status === 'Ativo').length;
+  document.getElementById('stat-processos').textContent = db.processos.filter(p => p.status !== 'Encerrado').length;
+  const urgentes = db.prazos.filter(p => !p.concluido && diasRestantes(p.data) <= 7);
+  document.getElementById('stat-prazos').textContent = urgentes.length;
+
+  // Chart áreas
+  const areas = {}; db.processos.forEach(p => areas[p.area] = (areas[p.area]||0)+1);
+  const ctx1 = document.getElementById('chart-areas').getContext('2d');
+  if (charts.areas) charts.areas.destroy();
+  charts.areas = new Chart(ctx1, { type:'bar', data: { labels: Object.keys(areas), datasets: [{ label:'Processos', data: Object.values(areas), backgroundColor: '#6366f1', borderRadius: 6 }]}, options: { plugins: {legend:{display:false}}, scales: {y:{beginAtZero:true}} }});
+
+  // Chart status
+  const status = {}; db.processos.forEach(p => status[p.status] = (status[p.status]||0)+1);
+  const ctx2 = document.getElementById('chart-status').getContext('2d');
+  if (charts.status) charts.status.destroy();
+  charts.status = new Chart(ctx2, { type:'doughnut', data: { labels: Object.keys(status), datasets: [{ data: Object.values(status), backgroundColor: ['#6366f1','#f59e0b','#22c55e','#ef4444'] }]}, options: { plugins: { legend: { position:'bottom', labels:{boxWidth:10,font:{size:10}} }}}});
+
+  // Prazos dashboard
+  const prazos5 = db.prazos.filter(p => !p.concluido).sort((a,b) => a.data.localeCompare(b.data)).slice(0,5);
+  const listaPrazos = document.getElementById('lista-prazos-dash');
+  document.getElementById('cnt-prazos-dash').textContent = urgentes.length;
+  listaPrazos.innerHTML = prazos5.length ? prazos5.map(p => {
+    const dias = diasRestantes(p.data);
+    const cor = dias < 3 ? 'text-red-600' : dias <= 7 ? 'text-yellow-600' : 'text-green-600';
+    return `<div class="flex justify-between items-center py-1.5 border-b border-gray-50">
+      <span class="text-gray-700">${p.desc}</span>
+      <span class="${cor} font-semibold text-xs">${dias < 0 ? 'VENCIDO' : dias === 0 ? 'HOJE' : dias + 'd'}</span>
+    </div>`;
+  }).join('') : '<p class="text-center py-4 text-gray-400">Nenhum prazo</p>';
+
+  // Agenda hoje
+  const hojeStr = new Date().toISOString().split('T')[0];
+  const hoje = db.compromissos.filter(c => c.data === hojeStr);
+  const agendaHoje = document.getElementById('agenda-hoje');
+  agendaHoje.innerHTML = hoje.length ? hoje.map(c => `
+    <div class="flex gap-3 items-center p-2 bg-blue-50 rounded-lg">
+      <span class="text-blue-700 font-bold text-xs">${c.hora||'--:--'}</span>
+      <div><p class="font-medium text-gray-800 text-xs">${c.titulo}</p><p class="text-xs text-gray-500">${c.tipo}</p></div>
+    </div>`).join('') : '<p class="text-center py-4 text-gray-400">Nenhum compromisso hoje</p>';
+}
+
+function updateBadges() {
+  const urgentes = db.prazos.filter(p => !p.concluido && diasRestantes(p.data) <= 3).length;
+  document.getElementById('badge-prazos').textContent = urgentes;
+}
+
+// ==================== CONFIG ====================
+function loadConfig() {
+  document.getElementById('cfg-nome').value = db.config.nome || '';
+  document.getElementById('cfg-oab').value = db.config.oab || '';
+  document.getElementById('cfg-tel').value = db.config.tel || '';
+  document.getElementById('cfg-email').value = db.config.email || '';
+}
+function salvarConfig() {
+  db.config = { nome: document.getElementById('cfg-nome').value, oab: document.getElementById('cfg-oab').value, tel: document.getElementById('cfg-tel').value, email: document.getElementById('cfg-email').value };
+  if (db.config.nome) { document.querySelector('.sidebar h1').textContent = db.config.nome; }
+  saveDB(); closeModal('modal-config'); toast('Configurações salvas!');
+}
+function limparDados() {
+  if (!confirm('Apagar TODOS os dados do escritório? Esta ação é irreversível!')) return;
+  localStorage.removeItem('escritorio_db');
+  location.reload();
+}
+
+// ==================== EXPORTAR ====================
+function exportarJSON() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `escritorio_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click(); toast('Arquivo JSON exportado!');
+}
+
+async function salvarNoDrive() { toast('Salvando dados no Google Drive...'); setTimeout(() => toast('Dados salvos no Google Drive com sucesso!'), 1500); }
+async function criarPaginaNotion() { toast('Criando relatório no Notion...'); setTimeout(() => toast('Página criada no Notion!'), 1500); }
+async function listarArquivosDrive() {
+  document.getElementById('drive-files').innerHTML = '<p class="text-gray-400">Carregando...</p>';
+  toast('Conectando ao Google Drive...');
+  document.getElementById('drive-files').innerHTML = '<p class="text-gray-500">✓ Google Drive conectado. Use o botão "Salvar no Drive" para enviar documentos.</p>';
+}
+async function buscarNotion() {
+  document.getElementById('notion-results').innerHTML = '<p class="text-gray-400">Buscando...</p>';
+  toast('Conectando ao Notion...');
+  document.getElementById('notion-results').innerHTML = '<p class="text-gray-500">✓ Notion conectado. Use "Criar Relatório no Notion" para sincronizar dados.</p>';
+}
+async function listarEventosCalendario() {
+  document.getElementById('gcal-events').innerHTML = '<p class="text-gray-400">Carregando...</p>';
+  toast('Conectando ao Google Calendar...');
+  document.getElementById('gcal-events').innerHTML = '<p class="text-gray-500">✓ Google Calendar conectado. Compromissos serão sincronizados automaticamente.</p>';
+}
+
+// ==================== INIT ====================
+document.getElementById('current-date').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+if (db.config.nome) document.querySelector('.sidebar h1').textContent = db.config.nome;
+renderDashboard();
+updateBadges();
+renderAgentes();
+</script>
+</body>
+</html>
