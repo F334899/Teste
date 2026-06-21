@@ -652,11 +652,48 @@
     </div>
 
     <div class="card p-5">
-      <h3 class="font-semibold text-gray-700 mb-3">Exportar Dados do Escritório</h3>
-      <div class="flex gap-3 flex-wrap">
-        <button onclick="exportarJSON()" class="btn btn-secondary text-sm"><i class="fas fa-download mr-2"></i>Exportar JSON</button>
-        <button onclick="salvarNoDrive()" class="btn btn-secondary text-sm"><i class="fab fa-google-drive mr-2 text-blue-600"></i>Salvar no Drive</button>
-        <button onclick="criarPaginaNotion()" class="btn btn-secondary text-sm"><i class="fas fa-book mr-2"></i>Criar Relatório no Notion</button>
+      <h3 class="font-semibold text-gray-700 mb-1">Backup e Restauração de Dados</h3>
+      <p class="text-xs text-gray-400 mb-4">Exporte regularmente para não perder nenhum dado. Para restaurar, basta importar o arquivo salvo.</p>
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Exportar -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <p class="font-medium text-gray-700 text-sm mb-1"><i class="fas fa-download text-indigo-500 mr-1"></i>Exportar</p>
+          <p class="text-xs text-gray-400 mb-3">Salva todos os dados do escritório em um arquivo seguro.</p>
+          <div class="flex flex-col gap-2">
+            <button onclick="exportarJSON()" class="btn btn-primary text-sm w-full">
+              <i class="fas fa-download mr-2"></i>Baixar Backup (.json)
+            </button>
+            <button onclick="salvarNoDrive()" class="btn btn-secondary text-sm w-full">
+              <i class="fab fa-google-drive mr-2 text-blue-600"></i>Salvar no Google Drive
+            </button>
+            <button onclick="criarPaginaNotion()" class="btn btn-secondary text-sm w-full">
+              <i class="fas fa-book mr-2 text-gray-500"></i>Relatório no Notion
+            </button>
+          </div>
+        </div>
+        <!-- Importar -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <p class="font-medium text-gray-700 text-sm mb-1"><i class="fas fa-upload text-green-500 mr-1"></i>Restaurar Backup</p>
+          <p class="text-xs text-gray-400 mb-3">Selecione um arquivo .json exportado anteriormente para restaurar todos os dados.</p>
+          <label class="btn btn-green text-sm w-full flex items-center justify-center cursor-pointer mb-2">
+            <i class="fas fa-upload mr-2"></i>Selecionar arquivo .json
+            <input type="file" accept=".json" onchange="importarJSON(event)" class="hidden">
+          </label>
+          <div id="import-status" class="text-xs text-gray-500 text-center min-h-[20px]"></div>
+          <div class="mt-3 pt-3 border-t border-gray-200">
+            <p class="text-xs text-gray-400 mb-2">Ou cole o conteúdo JSON aqui:</p>
+            <textarea id="import-json-text" rows="3" placeholder='{"clientes":[...],"processos":[...]}' class="text-xs"></textarea>
+            <button onclick="importarJSONTexto()" class="btn btn-secondary text-xs w-full mt-2">
+              <i class="fas fa-paste mr-1"></i>Importar do campo acima
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Resumo do banco atual -->
+      <div class="mt-4 pt-4 border-t border-gray-100">
+        <p class="text-xs font-medium text-gray-500 mb-2">Status atual do banco de dados:</p>
+        <div class="flex gap-4 flex-wrap" id="db-status">
+        </div>
       </div>
     </div>
   </div>
@@ -944,6 +981,7 @@ function showSection(name) {
   if (name === 'financeiro') renderFinanceiro();
   if (name === 'documentos') renderAgentes();
   if (name === 'djen') { renderHistoricoDJEN(); }
+  if (name === 'integracoes') { renderDBStatus(); }
   if (name === 'relatorio') { popularSelectRelatorio(); renderHistoricoRelatorios(); }
 }
 
@@ -1399,7 +1437,96 @@ function exportarJSON() {
   const blob = new Blob([JSON.stringify(db, null, 2)], {type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = `escritorio_backup_${new Date().toISOString().split('T')[0]}.json`;
-  a.click(); toast('Arquivo JSON exportado!');
+  a.click(); toast('Arquivo de backup exportado!');
+}
+
+function importarJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      processarImportacao(e.target.result, file.name);
+    } catch(err) {
+      document.getElementById('import-status').innerHTML = '<span class="text-red-500">❌ Arquivo inválido. Verifique se é um backup gerado por este sistema.</span>';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function importarJSONTexto() {
+  const texto = document.getElementById('import-json-text').value.trim();
+  if (!texto) { toast('Cole o conteúdo JSON no campo', 'err'); return; }
+  try {
+    processarImportacao(texto, 'campo de texto');
+  } catch(err) {
+    document.getElementById('import-status').innerHTML = '<span class="text-red-500">❌ JSON inválido. Verifique o conteúdo.</span>';
+  }
+}
+
+function processarImportacao(texto, origem) {
+  const dados = JSON.parse(texto);
+  // Validação básica
+  if (!dados || typeof dados !== 'object') throw new Error('inválido');
+
+  const antes = {
+    clientes: db.clientes.length,
+    processos: db.processos.length,
+    prazos: db.prazos.length,
+    honorarios: db.honorarios.length,
+  };
+
+  // Mescla inteligente: não duplica registros já existentes
+  const mesclar = (existentes, novos, campo = 'id') => {
+    const ids = new Set(existentes.map(x => x[campo]));
+    const ineditos = (novos || []).filter(x => !ids.has(x[campo]));
+    return [...existentes, ...ineditos];
+  };
+
+  if (dados.clientes)     db.clientes     = mesclar(db.clientes, dados.clientes);
+  if (dados.processos)    db.processos    = mesclar(db.processos, dados.processos);
+  if (dados.prazos)       db.prazos       = mesclar(db.prazos, dados.prazos);
+  if (dados.compromissos) db.compromissos = mesclar(db.compromissos, dados.compromissos);
+  if (dados.honorarios)   db.honorarios   = mesclar(db.honorarios, dados.honorarios);
+  if (dados.config && Object.keys(dados.config).length) db.config = { ...db.config, ...dados.config };
+  if (dados.historico_relatorios) db.historico_relatorios = mesclar(db.historico_relatorios || [], dados.historico_relatorios);
+  if (dados.historico_djen)       db.historico_djen       = mesclar(db.historico_djen || [], dados.historico_djen, 'data');
+
+  saveDB();
+
+  const novosClientes  = db.clientes.length  - antes.clientes;
+  const novosProcessos = db.processos.length - antes.processos;
+  const novosPrazos    = db.prazos.length    - antes.prazos;
+  const novosHon       = db.honorarios.length - antes.honorarios;
+
+  document.getElementById('import-status').innerHTML =
+    `<span class="text-green-600 font-medium">✓ Importado de ${origem}:<br>
+    +${novosClientes} clientes · +${novosProcessos} processos · +${novosPrazos} prazos · +${novosHon} honorários</span>`;
+
+  renderDBStatus();
+  updateBadges();
+  renderDashboard();
+
+  if (db.config.nome) document.querySelector('.sidebar h1').textContent = db.config.nome;
+  toast(`Backup restaurado com sucesso!`);
+}
+
+function renderDBStatus() {
+  const el = document.getElementById('db-status');
+  if (!el) return;
+  const items = [
+    { label: 'Clientes',    val: db.clientes.length,    cor: 'indigo' },
+    { label: 'Processos',   val: db.processos.length,   cor: 'blue'   },
+    { label: 'Prazos',      val: db.prazos.filter(p=>!p.concluido).length, cor: 'red' },
+    { label: 'Compromissos',val: db.compromissos.length, cor: 'purple' },
+    { label: 'Honorários',  val: db.honorarios.length,  cor: 'green'  },
+    { label: 'Relatórios',  val: (db.historico_relatorios||[]).length, cor: 'yellow' },
+  ];
+  el.innerHTML = items.map(i =>
+    `<span class="bg-${i.cor}-50 text-${i.cor}-700 border border-${i.cor}-200 text-xs px-3 py-1 rounded-full font-medium">
+      ${i.label}: <strong>${i.val}</strong>
+    </span>`
+  ).join('');
 }
 
 async function salvarNoDrive() { toast('Salvando dados no Google Drive...'); setTimeout(() => toast('Dados salvos no Google Drive com sucesso!'), 1500); }
