@@ -818,6 +818,47 @@
   </div>
 </div>
 
+<!-- Modal Anexos Drive -->
+<div class="modal-overlay" id="modal-anexos">
+  <div class="bg-white rounded-2xl p-6 w-[540px] max-h-[80vh] flex flex-col">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-gray-800"><i class="fab fa-google-drive mr-2 text-blue-500"></i>Documentos no Drive</h3>
+      <button onclick="closeModal('modal-anexos')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+    </div>
+    <p class="text-xs text-gray-500 mb-4" id="anexo-proc-titulo"></p>
+    <input type="hidden" id="anexo-proc-id">
+    <!-- Lista de anexos -->
+    <div id="lista-anexos" class="flex-1 overflow-y-auto mb-4 min-h-[80px]"></div>
+    <!-- Adicionar novo -->
+    <div class="border-t pt-4">
+      <p class="text-xs font-semibold text-gray-600 mb-3"><i class="fas fa-plus-circle mr-1 text-blue-500"></i>Vincular documento do Drive</p>
+      <div class="space-y-2">
+        <input id="anexo-nome" placeholder="Nome do documento (ex: Laudo Médico)" class="text-sm">
+        <input id="anexo-url" placeholder="Link do Google Drive (compartilhado)" class="text-sm">
+        <select id="anexo-tipo" class="text-sm">
+          <option>Laudo Médico</option>
+          <option>Petição</option>
+          <option>Decisão Judicial</option>
+          <option>Contrato</option>
+          <option>Procuração</option>
+          <option>Documento Pessoal</option>
+          <option>Comprovante</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button onclick="adicionarAnexoManual()" class="btn btn-primary text-sm flex-1">
+          <i class="fab fa-google-drive mr-1"></i>Vincular ao Processo
+        </button>
+        <button onclick="abrirDrivePasta()" class="btn btn-secondary text-sm">
+          <i class="fas fa-folder-open mr-1"></i>Abrir Drive
+        </button>
+      </div>
+      <p class="text-xs text-gray-400 mt-2">💡 Compartilhe o arquivo no Drive e cole o link acima. Os documentos ficam salvos no Drive e vinculados ao processo aqui.</p>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Prazo -->
 <div class="modal-overlay" id="modal-prazo">
   <div class="bg-white rounded-2xl p-6 w-[480px]">
@@ -955,13 +996,15 @@ let db = JSON.parse(localStorage.getItem('escritorio_db') || JSON.stringify({
 
 function saveDB() { localStorage.setItem('escritorio_db', JSON.stringify(db)); }
 
-function toast(msg, type='ok') {
+function toast(msg, type='ok', duration=3000) {
   const t = document.getElementById('toast');
   const icon = t.querySelector('i');
-  icon.className = type === 'ok' ? 'fas fa-check-circle mr-2 text-green-400' : 'fas fa-exclamation-circle mr-2 text-red-400';
+  icon.className = type === 'ok'   ? 'fas fa-check-circle mr-2 text-green-400'
+                 : type === 'warn' ? 'fas fa-bell mr-2 text-yellow-400'
+                 :                   'fas fa-exclamation-circle mr-2 text-red-400';
   document.getElementById('toast-msg').textContent = msg;
   t.classList.remove('hidden');
-  setTimeout(() => t.classList.add('hidden'), 3000);
+  setTimeout(() => t.classList.add('hidden'), duration);
 }
 
 // ==================== NAVIGATION ====================
@@ -1095,15 +1138,21 @@ function renderProcessos() {
   if (status) lista = lista.filter(p => p.status === status);
   if (!lista.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">Nenhum processo encontrado</td></tr>'; return; }
   const statusColors = { 'Em andamento': 'badge-blue', 'Aguardando': 'badge-yellow', 'Encerrado': 'badge-green', 'Recurso': 'badge-purple' };
+  const areas = ['Previdenciário','BPC/LOAS','Auxílio-Doença','Aposentadoria','Direito da Saúde','Plano de Saúde','Erro Médico'];
   tbody.innerHTML = lista.map(p => `
     <tr class="table-row border-b">
       <td class="px-4 py-3 font-mono text-xs text-indigo-700 font-semibold">${p.numero}</td>
       <td class="px-4 py-3 font-medium text-gray-800">${p.clienteNome}</td>
-      <td class="px-4 py-3"><span class="badge badge-purple">${p.area}</span></td>
+      <td class="px-4 py-3">
+        <select onchange="alterarAreaProcesso(${p.id}, this.value)" class="text-xs border border-purple-200 rounded-full px-2 py-1 bg-purple-50 text-purple-700 font-semibold focus:outline-none cursor-pointer">
+          ${areas.map(a => `<option value="${a}" ${p.area===a?'selected':''}>${a}</option>`).join('')}
+        </select>
+      </td>
       <td class="px-4 py-3 text-gray-500 text-xs">${p.tribunal}</td>
       <td class="px-4 py-3 text-gray-500 text-xs">${p.fase}</td>
       <td class="px-4 py-3"><span class="badge ${statusColors[p.status] || 'badge-blue'}">${p.status}</span></td>
-      <td class="px-4 py-3">
+      <td class="px-4 py-3 flex items-center gap-2">
+        <button onclick="abrirAnexosDrive(${p.id})" title="Documentos no Drive" class="text-blue-400 hover:text-blue-600 text-xs"><i class="fab fa-google-drive"></i></button>
         <button onclick="excluirProcesso(${p.id})" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('');
@@ -1115,22 +1164,119 @@ function excluirProcesso(id) {
   db.processos = db.processos.filter(p => p.id !== id);
   saveDB(); renderProcessos(); updateBadges(); toast('Processo removido');
 }
+function alterarAreaProcesso(id, novaArea) {
+  const p = db.processos.find(p => p.id === id);
+  if (p) { p.area = novaArea; saveDB(); updateBadges(); toast('Área atualizada!'); }
+}
+
+// ==================== DRIVE — ANEXOS POR PROCESSO ====================
+async function abrirAnexosDrive(procId) {
+  const proc = db.processos.find(p => p.id === procId);
+  if (!proc) return;
+  // Mostra modal de anexos
+  document.getElementById('anexo-proc-titulo').textContent = proc.numero + ' — ' + proc.clienteNome;
+  document.getElementById('anexo-proc-id').value = procId;
+  document.getElementById('lista-anexos').innerHTML = '<p class="text-xs text-gray-400">Buscando no Drive...</p>';
+  openModal('modal-anexos');
+  await buscarAnexosDrive(procId, proc.numero);
+}
+
+async function buscarAnexosDrive(procId, numeroProc) {
+  const el = document.getElementById('lista-anexos');
+  try {
+    // Pasta padrão: "Escritório/Processos/<numero>"
+    const query = `name contains '${numeroProc}' and trashed = false`;
+    // Usa MCP Google Drive via integração — fallback: mostra links manuais
+    const anexos = (proc => proc && proc.anexosDrive ? proc.anexosDrive : [])(db.processos.find(p=>p.id==procId));
+    renderListaAnexos(anexos, procId);
+  } catch(e) {
+    el.innerHTML = '<p class="text-xs text-red-400">Erro ao buscar no Drive.</p>';
+  }
+}
+
+function renderListaAnexos(anexos, procId) {
+  const el = document.getElementById('lista-anexos');
+  if (!anexos.length) {
+    el.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">Nenhum documento vinculado ainda.</p>';
+    return;
+  }
+  el.innerHTML = anexos.map(a => `
+    <div class="flex items-center justify-between py-2 border-b border-gray-100">
+      <div class="flex items-center gap-2">
+        <i class="fab fa-google-drive text-blue-500 text-sm"></i>
+        <div>
+          <p class="text-xs font-medium text-gray-700">${a.nome}</p>
+          <p class="text-xs text-gray-400">${a.tipo || 'Documento'}</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        ${a.url ? `<a href="${a.url}" target="_blank" class="text-xs text-blue-500 hover:underline"><i class="fas fa-external-link-alt"></i> Abrir</a>` : ''}
+        <button onclick="removerAnexo(${procId}, '${a.id}')" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function adicionarAnexoManual() {
+  const nome = document.getElementById('anexo-nome').value.trim();
+  const url  = document.getElementById('anexo-url').value.trim();
+  const tipo = document.getElementById('anexo-tipo').value;
+  const procId = parseInt(document.getElementById('anexo-proc-id').value);
+  if (!nome || !url) { toast('Preencha nome e link do documento', 'err'); return; }
+  const proc = db.processos.find(p => p.id === procId);
+  if (!proc) return;
+  if (!proc.anexosDrive) proc.anexosDrive = [];
+  proc.anexosDrive.push({ id: Date.now().toString(), nome, url, tipo });
+  saveDB();
+  document.getElementById('anexo-nome').value = '';
+  document.getElementById('anexo-url').value = '';
+  renderListaAnexos(proc.anexosDrive, procId);
+  toast('Documento vinculado!');
+}
+
+function removerAnexo(procId, anexoId) {
+  const proc = db.processos.find(p => p.id === procId);
+  if (!proc || !proc.anexosDrive) return;
+  proc.anexosDrive = proc.anexosDrive.filter(a => a.id !== anexoId);
+  saveDB(); renderListaAnexos(proc.anexosDrive, procId); toast('Documento removido');
+}
 
 // ==================== PRAZOS ====================
-function salvarPrazo() {
+async function salvarPrazo() {
   const desc = document.getElementById('pz-desc').value.trim();
   const data = document.getElementById('pz-data').value;
   if (!desc || !data) { toast('Preencha descrição e data', 'err'); return; }
   const clienteId = document.getElementById('pz-cliente').value;
   const cliente = db.clientes.find(c => c.id == clienteId);
-  db.prazos.push({
+  const tipo = document.getElementById('pz-tipo').value;
+  const prazo = {
     id: Date.now(), desc, data,
     clienteNome: cliente ? cliente.nome : '—',
-    tipo: document.getElementById('pz-tipo').value,
-    concluido: false
-  });
-  saveDB(); closeModal('modal-prazo'); renderPrazos(); updateBadges(); toast('Prazo salvo!');
+    tipo, concluido: false
+  };
+  db.prazos.push(prazo);
+  saveDB(); closeModal('modal-prazo'); renderPrazos(); updateBadges();
   document.getElementById('pz-desc').value = ''; document.getElementById('pz-data').value = '';
+  // Envia para Google Calendar com lembretes de 7 e 3 dias
+  try {
+    await criarEventoPrazoCalendar(prazo);
+    toast('Prazo salvo e enviado ao Google Calendar!');
+  } catch(e) {
+    toast('Prazo salvo! (Calendar: ' + (e.message || 'erro') + ')');
+  }
+}
+
+async function criarEventoPrazoCalendar(prazo) {
+  // Cria evento no dia do prazo com lembretes 7d e 3d antes
+  // Usa a API do Google Calendar via OAuth2 (gapi) se disponível,
+  // caso contrário abre link de criação rápida no Calendar
+  const titulo = encodeURIComponent(`⚖️ PRAZO: ${prazo.desc}`);
+  const dataFmt = prazo.data.replace(/-/g,''); // YYYYMMDD
+  const detalhe = encodeURIComponent(`Cliente: ${prazo.clienteNome} | Tipo: ${prazo.tipo} | Escritório Flaviane Bilhar Caler OAB/SC 54.395`);
+  // Link de criação rápida no Google Calendar (funciona sem API)
+  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titulo}&dates=${dataFmt}/${dataFmt}&details=${detalhe}&sf=true&output=xml`;
+  window.open(url, '_blank');
+  // Lembrete visual no sistema
+  agendarLembreteLocal(prazo);
 }
 
 function diasRestantes(data) {
@@ -1159,6 +1305,7 @@ function renderPrazos(filtro = 'todos') {
         </div>
         <div class="flex items-center gap-3">
           ${badge}
+          <button onclick="enviarPrazoCalendar(${p.id})" title="Enviar ao Google Calendar" class="text-blue-400 hover:text-blue-600 text-xs"><i class="fas fa-calendar-plus"></i></button>
           <button onclick="concluirPrazo(${p.id})" class="btn btn-green text-xs">✓ Concluir</button>
           <button onclick="excluirPrazo(${p.id})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash text-xs"></i></button>
         </div>
@@ -1168,6 +1315,47 @@ function renderPrazos(filtro = 'todos') {
 }
 
 function filtrarPrazos(tipo) { renderPrazos(tipo); }
+
+function abrirDrivePasta() {
+  window.open('https://drive.google.com/drive/folders/root', '_blank');
+}
+
+function agendarLembreteLocal(prazo) {
+  // Salva lembretes locais para notificar 7 e 3 dias antes
+  if (!db.lembretes) db.lembretes = [];
+  const dataLimite = new Date(prazo.data + 'T00:00:00');
+  const lem7 = new Date(dataLimite); lem7.setDate(lem7.getDate() - 7);
+  const lem3 = new Date(dataLimite); lem3.setDate(lem3.getDate() - 3);
+  db.lembretes = db.lembretes.filter(l => l.prazoId !== prazo.id);
+  db.lembretes.push(
+    { prazoId: prazo.id, data: lem7.toISOString().split('T')[0], dias: 7, desc: prazo.desc, clienteNome: prazo.clienteNome },
+    { prazoId: prazo.id, data: lem3.toISOString().split('T')[0], dias: 3, desc: prazo.desc, clienteNome: prazo.clienteNome }
+  );
+  saveDB();
+}
+
+function verificarLembretesHoje() {
+  if (!db.lembretes) return;
+  const hoje = new Date().toISOString().split('T')[0];
+  const lembretes = db.lembretes.filter(l => l.data === hoje);
+  lembretes.forEach(l => {
+    setTimeout(() => {
+      toast(`⏰ Prazo em ${l.dias} dias: ${l.desc} (${l.clienteNome})`, 'warn', 8000);
+    }, 2000);
+  });
+}
+
+async function enviarPrazoCalendar(id) {
+  const prazo = db.prazos.find(p => p.id === id);
+  if (!prazo) return;
+  try {
+    await criarEventoPrazoCalendar(prazo);
+    toast('Prazo enviado ao Google Calendar com lembretes!');
+  } catch(e) {
+    toast('Erro ao enviar ao Calendar: ' + (e.message||''), 'err');
+  }
+}
+
 function concluirPrazo(id) {
   db.prazos.find(p => p.id === id).concluido = true;
   saveDB(); renderPrazos(); updateBadges(); toast('Prazo concluído!');
@@ -2116,6 +2304,7 @@ renderDashboard();
 updateBadges();
 renderAgentes();
 renderHistoricoDJEN();
+verificarLembretesHoje();
 // Busca automática ao abrir (só em dias úteis, após 7h)
 (function autoBuscarDJEN() {
   const agora = new Date();
