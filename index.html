@@ -588,6 +588,8 @@
                 <option value="parcial">Parcialmente favorável — aspectos a superar</option>
                 <option value="aguardando">Em análise — aguardando elementos probatórios</option>
                 <option value="recurso">Em recurso — posição jurídica consolidada</option>
+                <option value="sentenciado">Sentenciado — aguardando cumprimento</option>
+                <option value="aguardando_mov">Aguardando movimentação processual</option>
               </select>
             </div>
 
@@ -2682,7 +2684,9 @@ const perspMap = {
   favoravel: 'O andamento do processo está <strong>caminhando bem</strong>. As provas e os argumentos apresentados são sólidos e favorecem o seu caso. Seguimos confiantes e trabalhando com dedicação para alcançar o melhor resultado para você.',
   parcial: 'O processo está progredindo, com <strong>boas chances</strong> de resultado positivo. Há pontos que ainda precisamos acompanhar com atenção, e estamos adotando todas as medidas necessárias para superá-los.',
   aguardando: 'Neste momento, <strong>aguardamos informações importantes</strong> para que possamos dar continuidade ao caso. Assim que tivermos um retorno, comunicaremos você imediatamente.',
-  recurso: 'Apresentamos um <strong>recurso contestando a decisão anterior</strong>. Temos boas razões para acreditar na revisão e seguimos acompanhando de perto o andamento.'
+  recurso: 'Apresentamos um <strong>recurso contestando a decisão anterior</strong>. Temos boas razões para acreditar na revisão e seguimos acompanhando de perto o andamento.',
+  sentenciado: 'O processo foi <strong>sentenciado</strong>. Estamos acompanhando os próximos passos para o cumprimento da decisão e adotando todas as providências cabíveis para garantir a efetividade do resultado obtido.',
+  aguardando_mov: 'O processo encontra-se <strong>aguardando movimentação processual</strong>. Estamos monitorando ativamente os autos e seremos notificados assim que houver qualquer atualização, comunicando você imediatamente.'
 };
 
 function gerarRelatorio() {
