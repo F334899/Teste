@@ -45,6 +45,11 @@
   .btn-green { background: #22c55e; color: white; }
   .btn-green:hover { background: #16a34a; }
   .table-row:hover { background: #f9fafb; }
+  .table-row-link { cursor: pointer; }
+  .table-row-link:hover td { background: #fdf5f4; }
+  .ficha-aba { color: #6b7280; border-bottom: 2px solid transparent; }
+  .ficha-aba:hover { color: #96655F; }
+  .ficha-aba-ativa { color: #96655F; border-bottom: 2px solid #96655F; background: white; }
   .prazo-urgente { border-left: 4px solid #ef4444; }
   .prazo-atencao { border-left: 4px solid #f59e0b; }
   .prazo-ok { border-left: 4px solid #22c55e; }
@@ -857,6 +862,32 @@
   </div>
 </div>
 
+<!-- Modal Ficha do Cliente -->
+<div class="modal-overlay" id="modal-ficha-cliente">
+  <div class="bg-white rounded-2xl w-[860px] max-h-[92vh] flex flex-col overflow-hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-[#96655F] to-[#7a504b]">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg" id="ficha-avatar">?</div>
+        <div>
+          <h3 class="text-white font-bold text-lg" id="ficha-nome">—</h3>
+          <p class="text-white/70 text-xs" id="ficha-subtitulo">—</p>
+        </div>
+      </div>
+      <button onclick="closeModal('modal-ficha-cliente')" class="text-white/70 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+    </div>
+    <!-- Abas -->
+    <div class="flex border-b bg-gray-50 px-6 gap-1 pt-2">
+      <button onclick="fichaAba('dados')" id="aba-dados" class="ficha-aba ficha-aba-ativa px-4 py-2 text-sm font-medium rounded-t-lg"><i class="fas fa-user mr-2"></i>Dados</button>
+      <button onclick="fichaAba('processos')" id="aba-processos" class="ficha-aba px-4 py-2 text-sm font-medium rounded-t-lg"><i class="fas fa-gavel mr-2"></i>Processos</button>
+      <button onclick="fichaAba('documentos')" id="aba-documentos" class="ficha-aba px-4 py-2 text-sm font-medium rounded-t-lg"><i class="fas fa-file-alt mr-2"></i>Documentos</button>
+      <button onclick="fichaAba('financeiro')" id="aba-financeiro" class="ficha-aba px-4 py-2 text-sm font-medium rounded-t-lg"><i class="fas fa-dollar-sign mr-2"></i>Financeiro</button>
+    </div>
+    <!-- Conteúdo -->
+    <div class="flex-1 overflow-y-auto p-6" id="ficha-conteudo"></div>
+  </div>
+</div>
+
 <!-- Modal Contrato de Honorários -->
 <div class="modal-overlay" id="modal-contrato">
   <div class="bg-white rounded-2xl p-6 w-[700px] max-h-[90vh] flex flex-col">
@@ -1184,6 +1215,161 @@ function populateClienteSelects() {
   });
 }
 
+// ==================== FICHA DO CLIENTE ====================
+let fichaClienteId = null;
+
+function abrirFichaCliente(id) {
+  fichaClienteId = id;
+  const c = db.clientes.find(x => x.id == id);
+  if (!c) return;
+  document.getElementById('ficha-avatar').textContent = c.nome.trim()[0].toUpperCase();
+  document.getElementById('ficha-nome').textContent = c.nome;
+  const procs = db.processos.filter(p => p.clienteId == id);
+  document.getElementById('ficha-subtitulo').textContent = `${c.area || 'Geral'} · ${procs.length} processo(s)`;
+  fichaAba('dados');
+  openModal('modal-ficha-cliente');
+}
+
+function fichaAba(aba) {
+  ['dados','processos','documentos','financeiro'].forEach(a => {
+    const el = document.getElementById('aba-' + a);
+    el.classList.toggle('ficha-aba-ativa', a === aba);
+  });
+  const c = db.clientes.find(x => x.id == fichaClienteId);
+  if (!c) return;
+  const el = document.getElementById('ficha-conteudo');
+  if (aba === 'dados') {
+    el.innerHTML = `
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div><label class="text-xs text-gray-400 uppercase font-medium">Nome Completo</label><p class="font-semibold text-gray-800 mt-1">${c.nome}</p></div>
+        <div><label class="text-xs text-gray-400 uppercase font-medium">CPF</label><p class="font-semibold text-gray-800 mt-1">${c.cpf || '—'}</p></div>
+        <div><label class="text-xs text-gray-400 uppercase font-medium">RG</label><p class="font-semibold text-gray-800 mt-1">${c.rg || '—'}</p></div>
+        <div><label class="text-xs text-gray-400 uppercase font-medium">Área</label><p class="font-semibold text-gray-800 mt-1">${c.area || '—'}</p></div>
+        <div><label class="text-xs text-gray-400 uppercase font-medium">Telefone</label><p class="font-semibold text-gray-800 mt-1">${c.tel || '—'}</p></div>
+        <div><label class="text-xs text-gray-400 uppercase font-medium">E-mail</label><p class="font-semibold text-gray-800 mt-1">${c.email || '—'}</p></div>
+        <div class="col-span-2"><label class="text-xs text-gray-400 uppercase font-medium">Endereço</label><p class="font-semibold text-gray-800 mt-1">${c.endereco || '—'}</p></div>
+        ${c.obs ? `<div class="col-span-2"><label class="text-xs text-gray-400 uppercase font-medium">Observações / Caso</label><p class="text-gray-700 mt-1 text-sm bg-amber-50 rounded-lg p-3">${c.obs.replace(/\n/g,'<br>')}</p></div>` : ''}
+      </div>`;
+  } else if (aba === 'processos') {
+    const procs = db.processos.filter(p => p.clienteId == fichaClienteId);
+    el.innerHTML = `
+      <div class="flex justify-between items-center mb-4">
+        <h4 class="font-semibold text-gray-700">Processos (${procs.length})</h4>
+        <button onclick="fichaNovoProcesso()" class="btn btn-primary text-sm"><i class="fas fa-plus mr-2"></i>Novo Processo</button>
+      </div>
+      ${procs.length === 0 ? '<p class="text-center py-8 text-gray-400">Nenhum processo vinculado</p>' :
+        procs.map(p => `
+          <div class="border rounded-xl p-4 mb-3 hover:border-[#96655F] transition-colors">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="font-semibold text-gray-800 text-sm">${p.numero}</p>
+                <p class="text-xs text-gray-500 mt-1">${p.tribunal || ''} · ${p.fase || ''}</p>
+              </div>
+              <span class="badge badge-${p.status === 'Ativo' ? 'green' : p.status === 'Arquivado' ? 'yellow' : 'blue'}">${p.status || 'Ativo'}</span>
+            </div>
+            ${p.obs ? `<p class="text-xs text-gray-500 mt-2">${p.obs}</p>` : ''}
+            <div class="flex gap-2 mt-3">
+              <button onclick="fichaNovoPrazo(${p.id})" class="text-xs btn btn-secondary py-1 px-3"><i class="fas fa-calendar-alt mr-1"></i>Prazo</button>
+              <button onclick="fichaGerarRelatorio(${fichaClienteId})" class="text-xs btn btn-secondary py-1 px-3"><i class="fas fa-file-alt mr-1"></i>Relatório</button>
+            </div>
+          </div>`).join('')}`;
+  } else if (aba === 'documentos') {
+    el.innerHTML = `
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="fichaGerarDoc(18)" class="flex items-center gap-3 p-4 border rounded-xl hover:border-[#96655F] hover:bg-rose-50 transition-all text-left">
+          <i class="fas fa-file-contract text-[#96655F] text-xl w-8"></i>
+          <div><p class="font-semibold text-gray-800 text-sm">Contrato de Honorários</p><p class="text-xs text-gray-500">Gerar e lançar no financeiro</p></div>
+        </button>
+        <button onclick="fichaGerarDoc(19)" class="flex items-center gap-3 p-4 border rounded-xl hover:border-[#96655F] hover:bg-rose-50 transition-all text-left">
+          <i class="fas fa-handshake text-[#96655F] text-xl w-8"></i>
+          <div><p class="font-semibold text-gray-800 text-sm">Procuração Ad Judicia</p><p class="text-xs text-gray-500">Documento de representação</p></div>
+        </button>
+        <button onclick="fichaGerarDoc(25)" class="flex items-center gap-3 p-4 border rounded-xl hover:border-[#96655F] hover:bg-rose-50 transition-all text-left">
+          <i class="fas fa-file-invoice text-[#96655F] text-xl w-8"></i>
+          <div><p class="font-semibold text-gray-800 text-sm">Proposta de Honorários</p><p class="text-xs text-gray-500">Proposta inicial ao cliente</p></div>
+        </button>
+        <button onclick="fichaGerarRelatorio(${c.id})" class="flex items-center gap-3 p-4 border rounded-xl hover:border-[#96655F] hover:bg-rose-50 transition-all text-left">
+          <i class="fas fa-chart-line text-[#96655F] text-xl w-8"></i>
+          <div><p class="font-semibold text-gray-800 text-sm">Relatório do Processo</p><p class="text-xs text-gray-500">Relatório para o cliente</p></div>
+        </button>
+      </div>`;
+  } else if (aba === 'financeiro') {
+    const hons = db.honorarios ? db.honorarios.filter(h => h.clienteNome && h.clienteNome.toLowerCase() === c.nome.toLowerCase()) : [];
+    const total = hons.reduce((s, h) => s + (h.valor || 0), 0);
+    const pago = hons.filter(h => h.status === 'Pago').reduce((s, h) => s + (h.valor || 0), 0);
+    el.innerHTML = `
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <p class="text-xs text-gray-500 mb-1">Total Contratado</p>
+          <p class="text-xl font-bold text-gray-800">R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</p>
+        </div>
+        <div class="bg-green-50 rounded-xl p-4 text-center">
+          <p class="text-xs text-gray-500 mb-1">Recebido</p>
+          <p class="text-xl font-bold text-green-700">R$ ${pago.toLocaleString('pt-BR',{minimumFractionDigits:2})}</p>
+        </div>
+        <div class="bg-amber-50 rounded-xl p-4 text-center">
+          <p class="text-xs text-gray-500 mb-1">Pendente</p>
+          <p class="text-xl font-bold text-amber-700">R$ ${(total-pago).toLocaleString('pt-BR',{minimumFractionDigits:2})}</p>
+        </div>
+      </div>
+      <div class="flex justify-between items-center mb-3">
+        <h4 class="font-semibold text-gray-700">Lançamentos</h4>
+        <button onclick="closeModal('modal-ficha-cliente'); setTimeout(()=>openModal('modal-honorario'),200)" class="btn btn-primary text-sm"><i class="fas fa-plus mr-2"></i>Novo Lançamento</button>
+      </div>
+      ${hons.length === 0 ? '<p class="text-center py-6 text-gray-400">Nenhum lançamento financeiro</p>' :
+        hons.map(h => `
+          <div class="flex items-center justify-between p-3 border rounded-lg mb-2">
+            <div><p class="font-medium text-gray-800 text-sm">${h.servico || 'Honorários'}</p><p class="text-xs text-gray-500">${h.vencimento || ''}</p></div>
+            <div class="text-right"><p class="font-bold text-gray-800">R$ ${(h.valor||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</p>
+              <span class="badge badge-${h.status==='Pago'?'green':h.status==='Atrasado'?'red':'yellow'}">${h.status}</span></div>
+          </div>`).join('')}`;
+  }
+}
+
+function fichaNovoProcesso() {
+  closeModal('modal-ficha-cliente');
+  setTimeout(() => {
+    openModal('modal-processo');
+    const sel = document.getElementById('proc-cliente');
+    if (sel) sel.value = fichaClienteId;
+  }, 200);
+}
+
+function fichaNovoPrazo(processoId) {
+  closeModal('modal-ficha-cliente');
+  setTimeout(() => {
+    openModal('modal-prazo');
+    const sel = document.getElementById('pz-processo');
+    if (sel) sel.value = processoId;
+    const csel = document.getElementById('pz-cliente');
+    if (csel) csel.value = fichaClienteId;
+  }, 200);
+}
+
+function fichaGerarDoc(docId) {
+  closeModal('modal-ficha-cliente');
+  setTimeout(() => {
+    if (docId === 18) {
+      abrirModalContrato();
+      setTimeout(() => { const sel = document.getElementById('contrato-cliente'); if (sel) sel.value = fichaClienteId; }, 100);
+    } else {
+      openModal('modal-documento');
+      setTimeout(() => {
+        const sel = document.getElementById('doc-cliente'); if (sel) sel.value = fichaClienteId;
+        gerarDocumento(docId);
+      }, 150);
+    }
+  }, 200);
+}
+
+function fichaGerarRelatorio(clienteId) {
+  closeModal('modal-ficha-cliente');
+  setTimeout(() => {
+    showSection('relatorio');
+    const sel = document.getElementById('rel-cliente'); if (sel) { sel.value = clienteId; autoPreencherCliente(); }
+  }, 200);
+}
+
 // ==================== CLIENTES ====================
 function importarClientesIniciais() {
   const dados = [{"id":1700000000,"nome":"Adelar Biazus","cpf":"033.263.309-87","rg":"1.274.396","email":"","tel":"","endereco":"Chapecó, SC","area":"Saúde","obs":"Oncológico — SC Saúde","status":"ativo"},{"id":1700000001,"nome":"Alice Fontana Vilani","cpf":"385.182.019-34","rg":"385.182.019-34 (CIN)","email":"","tel":"","endereco":"São Lourenço do Oeste, SC","area":"Saúde","obs":"Oncológico","status":"ativo"},{"id":1700000002,"nome":"Amanda Maurilio Rodrigues","cpf":"093.951.439-75","rg":"093.951.439-75 (CIN)","email":"","tel":"","endereco":"Rua Dr. João Colin, 453, apto 31, Centro, Joinville, SC, 89201-299","area":"Saúde","obs":"Dupilumabe — Dermatite Atópica","status":"ativo"},{"id":1700000003,"nome":"Antonio Carlos Do Amaral Barbosa","cpf":"013.168.576-70","rg":"11500616 (SSP/MG)","email":"anaizaamaral@gmail.com","tel":"","endereco":"Rua Padre Tobias, 74, Bairro Antonio Dias, Ouro Preto, MG, 35400-216","area":"Saúde","obs":"Homecare — ELA (Esclerose Lateral Amiotrófica) — Unimed Inconfidentes\nRepresentante legal: Ana Luiza Amaral Barbosa (irmã)","status":"ativo"},{"id":1700000004,"nome":"Antonio Mirto De Oliveira","cpf":"423.633.909-97","rg":"1124697 SSP SC","email":"","tel":"","endereco":"Rua Jardim Europa – D, 709D, Santa Maria, Chapecó, SC, 89812560","area":"Saúde","obs":"Proc. 5003143-04.2026.8.24.0018 — Obrigação de Fazer — Pazopanibe (CID C79.0). Tutela concedida 23/02/2026","status":"ativo"},{"id":1700000005,"nome":"Eda Hoffmann Paim","cpf":"286.903.540-34","rg":"2014890905","email":"","tel":"","endereco":"Rua Maxiliano de Almeida, n.1286, Casa, Lagoa Vermelha, RS, 95300-000","area":"Saúde","obs":"Proc. 5000799-14.2026.8.21.0057 — Oncológico — Abemaciclibe + Letrozol (CID C50) — IPE-SAÚDE/IPERGS","status":"ativo"},{"id":1700000006,"nome":"Edilson Tonello","cpf":"410.915.150-34","rg":"410.915.150-34 (CIN)","email":"","tel":"","endereco":"Porto Alegre, RS","area":"Saúde","obs":"Oncológico","status":"ativo"},{"id":1700000007,"nome":"Geni Ana Marqueti","cpf":"871.705.409-59","rg":"2.872.411","email":"","tel":"","endereco":"Xanxerê, SC","area":"Saúde","obs":"Imunoterapia","status":"ativo"},{"id":1700000008,"nome":"Gilmar De Matos","cpf":"678.404.000-78","rg":"7081224","email":"","tel":"","endereco":"Rua Heitor Vila Lobos, 1960-D, Apto 204, Esplanada, Chapecó, SC","area":"Saúde","obs":"Proc. 5000437-21.2021.8.21.0046 — Indenização por Erro Médico\nCo-autores: Ana Rita, Jairo, Marlei de Matos e Espólio de Joelson de Matos","status":"ativo"},{"id":1700000009,"nome":"Lina M De Araujo Herval","cpf":"","rg":"","email":"","tel":"","endereco":"","area":"Saúde","obs":"Produção de Provas / Reajuste — Bradesco Saúde Multi Top","status":"ativo"},{"id":1700000010,"nome":"Lucrecia Bargnin Liliana","cpf":"","rg":"","email":"","tel":"","endereco":"Hospital Regional do Oeste, Chapecó/SC (internada), Chapecó, SC","area":"Saúde","obs":"Imunoglobulina — Miastenia Gravis Generalizada / Imunossupressão","status":"ativo"},{"id":1700000011,"nome":"Lucilene Pires Da Silva","cpf":"004.303.100-56","rg":"3088472729 SJS/RS","email":"","tel":"","endereco":"Rua Panamericana, n. 258, São Tomé, Viamão, RS, 94.460-080","area":"Saúde","obs":"Proc. 5014416-03.2023.8.21.0039 — Ação Indenizatória por Erro Médico","status":"ativo"},{"id":1700000012,"nome":"Maria Cristina Flores Soares","cpf":"369.074.480-68","rg":"7119688799","email":"mcflores01@gmail.com","tel":"(47) 99153-2293","endereco":"Rua 2350, nº 118, Apto. 1001, Centro, Balneário Camboriú, SC, 88330-420","area":"Saúde","obs":"DMRI — Pegcetacoplan","status":"ativo"},{"id":1700000013,"nome":"Reiziane Dos Prazeres Da Silva","cpf":"083.076.775-48","rg":"21.211.513-89","email":"","tel":"","endereco":"BA","area":"Saúde","obs":"Dupilumabe — naturalidade: Pojuca/BA","status":"ativo"},{"id":1700000014,"nome":"Suema Maria L Da Bosco","cpf":"","rg":"","email":"","tel":"","endereco":"Chapecó, SC","area":"Saúde","obs":"Eletrodo — Unimed Chapecó (Plano Uniflex Estadual)","status":"ativo"}];
@@ -1299,13 +1485,13 @@ function renderClientes(filtro = '') {
   }
   if (trInicial) trInicial.style.display = 'none';
   tbody.innerHTML = lista.map(c => `
-    <tr class="table-row border-b">
-      <td class="px-4 py-3 font-medium text-gray-800">${c.nome}</td>
+    <tr class="table-row table-row-link border-b" onclick="abrirFichaCliente(${c.id})">
+      <td class="px-4 py-3 font-medium text-[#96655F]">${c.nome} <i class="fas fa-chevron-right text-xs text-gray-300 ml-1"></i></td>
       <td class="px-4 py-3 text-gray-500">${c.cpf || '—'}</td>
       <td class="px-4 py-3"><span class="badge badge-purple">${c.area}</span></td>
       <td class="px-4 py-3 text-gray-500">${c.tel || c.email || '—'}</td>
-      <td class="px-4 py-3"><span class="badge badge-green">${c.status}</span></td>
-      <td class="px-4 py-3 flex gap-2">
+      <td class="px-4 py-3"><span class="badge badge-green">${c.status || 'Ativo'}</span></td>
+      <td class="px-4 py-3 flex gap-2" onclick="event.stopPropagation()">
         <button onclick="excluirCliente(${c.id})" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('');
