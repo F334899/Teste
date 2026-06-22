@@ -245,6 +245,9 @@
         </thead>
         <tbody id="tabela-clientes">
           <tr><td colspan="6" class="text-center py-8 text-gray-400">Nenhum cliente cadastrado</td></tr>
+          <tr id="tr-importar-inicial" style="display:none"><td colspan="6" class="text-center py-4">
+            <button onclick="importarClientesIniciais()" class="btn btn-primary"><i class="fas fa-upload mr-2"></i>Importar 15 Clientes da Planilha</button>
+          </td></tr>
         </tbody>
       </table>
     </div>
@@ -1179,6 +1182,19 @@ function populateClienteSelects() {
 }
 
 // ==================== CLIENTES ====================
+function importarClientesIniciais() {
+  const dados = [{"id":1700000000,"nome":"Adelar Biazus","cpf":"033.263.309-87","rg":"1.274.396","email":"","tel":"","endereco":"Chapecó, SC","area":"Saúde","obs":"Oncológico — SC Saúde","status":"ativo"},{"id":1700000001,"nome":"Alice Fontana Vilani","cpf":"385.182.019-34","rg":"385.182.019-34 (CIN)","email":"","tel":"","endereco":"São Lourenço do Oeste, SC","area":"Saúde","obs":"Oncológico","status":"ativo"},{"id":1700000002,"nome":"Amanda Maurilio Rodrigues","cpf":"093.951.439-75","rg":"093.951.439-75 (CIN)","email":"","tel":"","endereco":"Rua Dr. João Colin, 453, apto 31, Centro, Joinville, SC, 89201-299","area":"Saúde","obs":"Dupilumabe — Dermatite Atópica","status":"ativo"},{"id":1700000003,"nome":"Antonio Carlos Do Amaral Barbosa","cpf":"013.168.576-70","rg":"11500616 (SSP/MG)","email":"anaizaamaral@gmail.com","tel":"","endereco":"Rua Padre Tobias, 74, Bairro Antonio Dias, Ouro Preto, MG, 35400-216","area":"Saúde","obs":"Homecare — ELA (Esclerose Lateral Amiotrófica) — Unimed Inconfidentes\nRepresentante legal: Ana Luiza Amaral Barbosa (irmã)","status":"ativo"},{"id":1700000004,"nome":"Antonio Mirto De Oliveira","cpf":"423.633.909-97","rg":"1124697 SSP SC","email":"","tel":"","endereco":"Rua Jardim Europa – D, 709D, Santa Maria, Chapecó, SC, 89812560","area":"Saúde","obs":"Proc. 5003143-04.2026.8.24.0018 — Obrigação de Fazer — Pazopanibe (CID C79.0). Tutela concedida 23/02/2026","status":"ativo"},{"id":1700000005,"nome":"Eda Hoffmann Paim","cpf":"286.903.540-34","rg":"2014890905","email":"","tel":"","endereco":"Rua Maxiliano de Almeida, n.1286, Casa, Lagoa Vermelha, RS, 95300-000","area":"Saúde","obs":"Proc. 5000799-14.2026.8.21.0057 — Oncológico — Abemaciclibe + Letrozol (CID C50) — IPE-SAÚDE/IPERGS","status":"ativo"},{"id":1700000006,"nome":"Edilson Tonello","cpf":"410.915.150-34","rg":"410.915.150-34 (CIN)","email":"","tel":"","endereco":"Porto Alegre, RS","area":"Saúde","obs":"Oncológico","status":"ativo"},{"id":1700000007,"nome":"Geni Ana Marqueti","cpf":"871.705.409-59","rg":"2.872.411","email":"","tel":"","endereco":"Xanxerê, SC","area":"Saúde","obs":"Imunoterapia","status":"ativo"},{"id":1700000008,"nome":"Gilmar De Matos","cpf":"678.404.000-78","rg":"7081224","email":"","tel":"","endereco":"Rua Heitor Vila Lobos, 1960-D, Apto 204, Esplanada, Chapecó, SC","area":"Saúde","obs":"Proc. 5000437-21.2021.8.21.0046 — Indenização por Erro Médico\nCo-autores: Ana Rita, Jairo, Marlei de Matos e Espólio de Joelson de Matos","status":"ativo"},{"id":1700000009,"nome":"Lina M De Araujo Herval","cpf":"","rg":"","email":"","tel":"","endereco":"","area":"Saúde","obs":"Produção de Provas / Reajuste — Bradesco Saúde Multi Top","status":"ativo"},{"id":1700000010,"nome":"Lucrecia Bargnin Liliana","cpf":"","rg":"","email":"","tel":"","endereco":"Hospital Regional do Oeste, Chapecó/SC (internada), Chapecó, SC","area":"Saúde","obs":"Imunoglobulina — Miastenia Gravis Generalizada / Imunossupressão","status":"ativo"},{"id":1700000011,"nome":"Lucilene Pires Da Silva","cpf":"004.303.100-56","rg":"3088472729 SJS/RS","email":"","tel":"","endereco":"Rua Panamericana, n. 258, São Tomé, Viamão, RS, 94.460-080","area":"Saúde","obs":"Proc. 5014416-03.2023.8.21.0039 — Ação Indenizatória por Erro Médico","status":"ativo"},{"id":1700000012,"nome":"Maria Cristina Flores Soares","cpf":"369.074.480-68","rg":"7119688799","email":"mcflores01@gmail.com","tel":"(47) 99153-2293","endereco":"Rua 2350, nº 118, Apto. 1001, Centro, Balneário Camboriú, SC, 88330-420","area":"Saúde","obs":"DMRI — Pegcetacoplan","status":"ativo"},{"id":1700000013,"nome":"Reiziane Dos Prazeres Da Silva","cpf":"083.076.775-48","rg":"21.211.513-89","email":"","tel":"","endereco":"BA","area":"Saúde","obs":"Dupilumabe — naturalidade: Pojuca/BA","status":"ativo"},{"id":1700000014,"nome":"Suema Maria L Da Bosco","cpf":"","rg":"","email":"","tel":"","endereco":"Chapecó, SC","area":"Saúde","obs":"Eletrodo — Unimed Chapecó (Plano Uniflex Estadual)","status":"ativo"}];
+  let adicionados = 0, duplicados = 0;
+  dados.forEach(c => {
+    const existe = db.clientes.some(x => (c.cpf && x.cpf === c.cpf) || x.nome.toLowerCase() === c.nome.toLowerCase());
+    if (existe) { duplicados++; return; }
+    db.clientes.push(c);
+    adicionados++;
+  });
+  saveDB(); renderClientes(); updateBadges();
+  toast(`✅ ${adicionados} cliente(s) importado(s)!${duplicados ? ` (${duplicados} já existiam)` : ''}`, 'ok', 6000);
+}
+
 function importarCSVNotion(input) {
   const file = input.files[0];
   if (!file) return;
@@ -1271,8 +1287,14 @@ function salvarCliente() {
 
 function renderClientes(filtro = '') {
   const tbody = document.getElementById('tabela-clientes');
-  const lista = filtro ? db.clientes.filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()) || c.cpf.includes(filtro)) : db.clientes;
-  if (!lista.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">Nenhum cliente encontrado</td></tr>'; return; }
+  const lista = filtro ? db.clientes.filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()) || (c.cpf||'').includes(filtro)) : db.clientes;
+  const trInicial = document.getElementById('tr-importar-inicial');
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">Nenhum cliente encontrado</td></tr>';
+    if (trInicial) trInicial.style.display = db.clientes.length === 0 ? '' : 'none';
+    return;
+  }
+  if (trInicial) trInicial.style.display = 'none';
   tbody.innerHTML = lista.map(c => `
     <tr class="table-row border-b">
       <td class="px-4 py-3 font-medium text-gray-800">${c.nome}</td>
