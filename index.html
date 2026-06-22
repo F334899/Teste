@@ -221,6 +221,10 @@
         <button onclick="openModal('modal-importar-doc')" class="btn btn-secondary">
           <i class="fas fa-file-import mr-2"></i>Importar da Procuração
         </button>
+        <button onclick="document.getElementById('csv-notion-input').click()" class="btn btn-secondary">
+          <i class="fab fa-notion mr-2"></i>Importar CSV do Notion
+        </button>
+        <input type="file" id="csv-notion-input" accept=".csv" class="hidden" onchange="importarCSVNotion(this)">
         <button onclick="openModal('modal-cliente')" class="btn btn-primary">
           <i class="fas fa-plus mr-2"></i>Novo Cliente
         </button>
@@ -1175,6 +1179,74 @@ function populateClienteSelects() {
 }
 
 // ==================== CLIENTES ====================
+function importarCSVNotion(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const linhas = text.split(/\r?\n/).filter(l => l.trim());
+    if (linhas.length < 2) { toast('CSV vazio ou inválido', 'err'); return; }
+
+    // detecta separador (vírgula ou ponto-e-vírgula)
+    const sep = linhas[0].includes(';') ? ';' : ',';
+
+    function parseCSVLine(line) {
+      const result = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') { inQ = !inQ; }
+        else if (c === sep && !inQ) { result.push(cur.trim()); cur = ''; }
+        else { cur += c; }
+      }
+      result.push(cur.trim());
+      return result;
+    }
+
+    const headers = parseCSVLine(linhas[0]).map(h => h.replace(/^"|"$/g,'').trim());
+    // mapeia colunas do Notion para campos do sistema
+    const col = (row, ...names) => {
+      for (const n of names) {
+        const idx = headers.findIndex(h => h.toLowerCase().includes(n.toLowerCase()));
+        if (idx >= 0 && row[idx]) return row[idx].replace(/^"|"$/g,'').trim();
+      }
+      return '';
+    };
+
+    let novos = 0, duplicados = 0;
+    for (let i = 1; i < linhas.length; i++) {
+      const row = parseCSVLine(linhas[i]);
+      const nome = col(row, 'Nome Completo', 'Nome');
+      if (!nome) continue;
+      const cpf = col(row, 'CPF');
+      // evita duplicata por CPF ou nome
+      const existe = db.clientes.some(c =>
+        (cpf && c.cpf === cpf) || c.nome.toLowerCase() === nome.toLowerCase()
+      );
+      if (existe) { duplicados++; continue; }
+      db.clientes.push({
+        id: Date.now() + i,
+        nome,
+        cpf,
+        rg: col(row, 'RG'),
+        email: col(row, 'E-mail', 'Email'),
+        tel: col(row, 'Telefone', 'Tel'),
+        endereco: [col(row,'Endereço','Endereco'), col(row,'Bairro'), col(row,'Cidade'), col(row,'Estado'), col(row,'CEP')].filter(Boolean).join(', '),
+        area: col(row, 'Área', 'Area', 'Especialidade') || 'Geral',
+        obs: col(row, 'Observações', 'Observacoes', 'Obs'),
+        status: 'ativo'
+      });
+      novos++;
+    }
+    saveDB(); renderClientes(); updateBadges();
+    input.value = '';
+    if (novos > 0) toast(`✅ ${novos} cliente(s) importado(s) do Notion!${duplicados ? ` (${duplicados} já existiam)` : ''}`, 'ok', 6000);
+    else toast(`Nenhum cliente novo. ${duplicados} já estavam cadastrados.`, 'warn');
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
 function salvarCliente() {
   const nome = document.getElementById('cli-nome').value.trim();
   if (!nome) { toast('Informe o nome do cliente', 'err'); return; }
