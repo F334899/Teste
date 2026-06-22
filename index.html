@@ -950,25 +950,76 @@
 
 <!-- Modal Compromisso -->
 <div class="modal-overlay" id="modal-compromisso">
-  <div class="bg-white rounded-2xl p-6 w-[480px]">
-    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-calendar-plus mr-2 text-blue-500"></i>Novo Compromisso</h3>
+  <div class="bg-white rounded-2xl p-6 w-[520px]">
+    <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-calendar-plus mr-2" style="color:#96655F"></i>Novo Compromisso</h3>
     <div class="space-y-3">
-      <div><label class="text-xs text-gray-500 mb-1 block">Título *</label><input id="comp-titulo" placeholder="Ex: Audiência de instrução"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Título *</label><input id="comp-titulo" placeholder="Ex: Audiência de instrução, Consulta médica..."></div>
       <div class="grid grid-cols-2 gap-3">
         <div><label class="text-xs text-gray-500 mb-1 block">Data *</label><input type="date" id="comp-data"></div>
         <div><label class="text-xs text-gray-500 mb-1 block">Horário</label><input type="time" id="comp-hora"></div>
       </div>
-      <div><label class="text-xs text-gray-500 mb-1 block">Tipo</label>
-        <select id="comp-tipo">
-          <option>Audiência</option>
-          <option>Reunião com cliente</option>
-          <option>Perícia médica</option>
-          <option>Protocolo</option>
-          <option>Outro</option>
-        </select>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-xs text-gray-500 mb-1 block">Tipo</label>
+          <select id="comp-tipo">
+            <optgroup label="Jurídico">
+              <option>Audiência</option>
+              <option>Prazo processual</option>
+              <option>Protocolo</option>
+              <option>Perícia médica</option>
+              <option>Reunião com cliente</option>
+              <option>Reunião interna</option>
+            </optgroup>
+            <optgroup label="Pessoal">
+              <option>Compromisso pessoal</option>
+              <option>Consulta médica</option>
+              <option>Curso / Capacitação</option>
+              <option>Viagem</option>
+              <option>Aniversário</option>
+              <option>Lembrete</option>
+            </optgroup>
+            <optgroup label="Outros">
+              <option>Outro</option>
+            </optgroup>
+          </select>
+        </div>
+        <div><label class="text-xs text-gray-500 mb-1 block">Prioridade</label>
+          <select id="comp-prioridade">
+            <option value="urgente">🔴 Urgente</option>
+            <option value="media" selected>🟡 Média</option>
+            <option value="baixa">🟢 Baixa</option>
+          </select>
+        </div>
       </div>
-      <div><label class="text-xs text-gray-500 mb-1 block">Local / Link</label><input id="comp-local" placeholder="Endereço ou link da reunião"></div>
-      <div><label class="text-xs text-gray-500 mb-1 block">Cliente</label><select id="comp-cliente"><option value="">Selecione...</option></select></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Etiqueta / Cor</label>
+        <div class="flex gap-2 mt-1" id="comp-cor-opcoes">
+          <label class="flex items-center gap-1.5 cursor-pointer text-xs">
+            <input type="radio" name="comp-cor" value="#96655F" checked class="hidden">
+            <span class="w-5 h-5 rounded-full border-2 border-white ring-2 ring-[#96655F]" style="background:#96655F" id="cor-dot-96655F"></span> Escritório
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer text-xs">
+            <input type="radio" name="comp-cor" value="#ef4444" class="hidden">
+            <span class="w-5 h-5 rounded-full border-2 border-white ring-1 ring-gray-200" style="background:#ef4444"></span> Urgente
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer text-xs">
+            <input type="radio" name="comp-cor" value="#3b82f6" class="hidden">
+            <span class="w-5 h-5 rounded-full border-2 border-white ring-1 ring-gray-200" style="background:#3b82f6"></span> Judicial
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer text-xs">
+            <input type="radio" name="comp-cor" value="#22c55e" class="hidden">
+            <span class="w-5 h-5 rounded-full border-2 border-white ring-1 ring-gray-200" style="background:#22c55e"></span> Pessoal
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer text-xs">
+            <input type="radio" name="comp-cor" value="#f59e0b" class="hidden">
+            <span class="w-5 h-5 rounded-full border-2 border-white ring-1 ring-gray-200" style="background:#f59e0b"></span> Prazo
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer text-xs">
+            <input type="radio" name="comp-cor" value="#8b5cf6" class="hidden">
+            <span class="w-5 h-5 rounded-full border-2 border-white ring-1 ring-gray-200" style="background:#8b5cf6"></span> Reunião
+          </label>
+        </div>
+      </div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Local / Link</label><input id="comp-local" placeholder="Endereço, link ou observação"></div>
+      <div><label class="text-xs text-gray-500 mb-1 block">Cliente (opcional)</label><select id="comp-cliente"><option value="">Selecione...</option></select></div>
     </div>
     <div class="flex justify-end gap-3 mt-5">
       <button onclick="closeModal('modal-compromisso')" class="btn btn-secondary">Cancelar</button>
@@ -1435,10 +1486,13 @@ function salvarCompromisso() {
   if (!titulo || !data) { toast('Preencha título e data', 'err'); return; }
   const clienteId = document.getElementById('comp-cliente').value;
   const cliente = db.clientes.find(c => c.id == clienteId);
+  const corChecked = document.querySelector('[name="comp-cor"]:checked');
   db.compromissos.push({
     id: Date.now(), titulo, data,
     hora: document.getElementById('comp-hora').value,
     tipo: document.getElementById('comp-tipo').value,
+    prioridade: document.getElementById('comp-prioridade').value,
+    cor: corChecked ? corChecked.value : '#96655F',
     local: document.getElementById('comp-local').value,
     clienteNome: cliente ? cliente.nome : '—'
   });
@@ -1457,15 +1511,18 @@ function renderCalendario() {
   for (let i = 0; i < primeiro; i++) cal.innerHTML += `<div></div>`;
   for (let d = 1; d <= diasNoMes; d++) {
     const dataStr = `${calAno}-${String(calMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const temEvento = db.compromissos.some(c => c.data === dataStr);
+    const eventosdia = db.compromissos.filter(c => c.data === dataStr);
     const isHoje = d === hoje.getDate() && calMes === hoje.getMonth() && calAno === hoje.getFullYear();
+    const dots = eventosdia.slice(0,4).map(e => `<div class="w-2 h-2 rounded-full inline-block mr-0.5" style="background:${e.cor||'#96655F'}"></div>`).join('');
     cal.innerHTML += `<div onclick="mostrarDia('${dataStr}')" class="min-h-[50px] rounded-lg p-1.5 cursor-pointer hover:bg-rose-50 border ${isHoje ? 'bg-rose-600 text-white border-rose-600' : 'border-gray-100 bg-white'}">
       <span class="text-xs font-semibold">${d}</span>
-      ${temEvento ? `<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1"></div>` : ''}
+      ${eventosdia.length ? `<div class="flex flex-wrap gap-0.5 mt-1">${dots}</div>` : ''}
     </div>`;
   }
   mostrarDia(hoje.toISOString().split('T')[0]);
 }
+
+const _prioridadeBadge = { urgente: '<span class="text-xs font-bold text-red-600">🔴 Urgente</span>', media: '<span class="text-xs font-bold text-yellow-600">🟡 Média</span>', baixa: '<span class="text-xs font-bold text-green-600">🟢 Baixa</span>' };
 
 function mostrarDia(data) {
   const eventos = db.compromissos.filter(c => c.data === data);
@@ -1474,11 +1531,12 @@ function mostrarDia(data) {
   const el = document.getElementById('lista-compromissos');
   if (!eventos.length) { el.innerHTML = '<p class="text-center py-4 text-gray-400">Nenhum compromisso neste dia</p>'; return; }
   el.innerHTML = eventos.sort((a,b) => (a.hora||'').localeCompare(b.hora||'')).map(e => `
-    <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-      <div class="text-blue-700 font-bold text-sm w-12 shrink-0">${e.hora || '--:--'}</div>
+    <div class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border-l-4" style="border-left-color:${e.cor||'#96655F'}">
+      <div class="font-bold text-sm w-12 shrink-0" style="color:${e.cor||'#96655F'}">${e.hora || '--:--'}</div>
       <div class="flex-1">
         <p class="font-medium text-gray-800 text-sm">${e.titulo}</p>
         <p class="text-xs text-gray-500">${e.tipo} · ${e.clienteNome}${e.local ? ' · ' + e.local : ''}</p>
+        ${e.prioridade ? (_prioridadeBadge[e.prioridade]||'') : ''}
       </div>
       <button onclick="excluirCompromisso(${e.id})" class="text-red-400 text-xs"><i class="fas fa-trash"></i></button>
     </div>`).join('');
